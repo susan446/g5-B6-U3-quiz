@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G5 Book6 Unit3 聽說練習闖關</title>
+    
+    <!-- 引入 Tailwind CSS 進行排版與設計 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Lucide Icons 圖示庫 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 自訂動畫與列印樣式 -->
+    <style>
+        @keyframes zoom-in {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-zoom-in {
+            animation: zoom-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @media print {
+            body { background: white !important; }
+            nav { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-indigo-50/30 font-sans text-gray-900 pb-12 min-h-screen">
+
+    <div id="app"></div>
+
+    <script>
+        // ✅ 替換為您的 Google Apps Script 網址
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtmqvy9miyhwKQqFY_cSk_Cj2Uh_-qRZF_R8UZBxFLUTG9sm5C8LgrKY_KhM43BqHf/exec"; 
+
+        // 統一定義圖片網址，確保單字與題目顯示完全一致的圖片
+        function createImg(content, text) {
+            const isSvg = content.trim().startsWith('<');
+            const visual = isSvg ? content : `<text x="50%" y="45%" font-size="180" text-anchor="middle" dominant-baseline="middle">${content}</text>`;
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+                <rect width="100%" height="100%" fill="#EEF2FF" rx="40"/>
+                ${visual}
+                <text x="50%" y="82%" font-size="45" font-family="sans-serif" font-weight="900" fill="#4F46E5" text-anchor="middle">${text}</text>
+            </svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
+
+        const IMAGES = {
+            dress: createImg('👗', 'Dress'),
+            skirt: createImg(`
+                <path d="M 140 120 L 260 120 L 320 270 L 80 270 Z" fill="#F472B6"/>
+                <path d="M 140 120 Q 200 145 260 120 L 260 135 Q 200 160 140 135 Z" fill="#DB2777"/>
+                <path d="M 160 138 L 120 270 M 200 148 L 200 270 M 240 138 L 280 270" stroke="#DB2777" stroke-width="8" stroke-linecap="round"/>
+            `, 'Skirt'), 
+            sweater: createImg('🧥', 'Sweater'),
+            tshirt: createImg('👕', 'T-shirt'),
+            pants: createImg('👖', 'Pants'),
+            shorts: createImg('🩳', 'Shorts'),
+            sneakers: createImg(`
+                <g transform="translate(135, 180) rotate(-5)">
+                    <text x="0" y="0" font-size="140" text-anchor="middle" dominant-baseline="middle">👟</text>
+                </g>
+                <g transform="translate(265, 180) scale(-1, 1) rotate(-5)">
+                    <text x="0" y="0" font-size="140" text-anchor="middle" dominant-baseline="middle">👟</text>
+                </g>
+            `, 'Sneakers'),
+            socks: createImg('🧦', 'Socks')
+        };
+
+        const LESSONS = [
+            {
+                id: 1,
+                title: "Unit 3 (Part 1): How much is the dress?",
+                subtitle: "單字與單數句型",
+                vocabulary: [
+                    { word: "dress", chinese: "洋裝", sentence: "It is a beautiful dress.", img: IMAGES.dress },
+                    { word: "skirt", chinese: "裙子", sentence: "I like this skirt.", img: IMAGES.skirt },
+                    { word: "sweater", chinese: "毛衣", sentence: "It is a warm sweater.", img: IMAGES.sweater },
+                    { word: "T-shirt", chinese: "T恤", sentence: "How much is the T-shirt?", img: IMAGES.tshirt }
+                ],
+                questions: [
+                    { q: "How much is the dress?", chinese: "這件洋裝多少錢？", a: "dress", img: IMAGES.dress },
+                    { q: "It's nine hundred dollars.", chinese: "它是九百元。(指洋裝)", a: "nine hundred", img: IMAGES.dress },
+                    { q: "How much is the skirt?", chinese: "這件裙子多少錢？", a: "skirt", img: IMAGES.skirt },
+                    { q: "It's two hundred and ninety dollars.", chinese: "它是二百九十元。(指裙子)", a: "ninety", img: IMAGES.skirt },
+                    { q: "How much is the sweater?", chinese: "這件毛衣多少錢？", a: "sweater", img: IMAGES.sweater },
+                    { q: "It's five hundred dollars.", chinese: "它是五百元。(指毛衣)", a: "five hundred", img: IMAGES.sweater },
+                    { q: "How much is the T-shirt?", chinese: "這件T恤多少錢？", a: "t-shirt", img: IMAGES.tshirt },
+                    { q: "It's three hundred dollars.", chinese: "它是三百元。(指T恤)", a: "three hundred", img: IMAGES.tshirt }
+                ]
+            },
+            {
+                id: 2,
+                title: "Unit 3 (Part 2): How much are the pants?",
+                subtitle: "複數名詞與價錢",
+                vocabulary: [
+                    { word: "pants", chinese: "長褲", sentence: "How much are the pants?", img: IMAGES.pants },
+                    { word: "shorts", chinese: "短褲", sentence: "These are my shorts.", img: IMAGES.shorts },
+                    { word: "sneakers", chinese: "運動鞋", sentence: "How much are the sneakers?", img: IMAGES.sneakers },
+                    { word: "socks", chinese: "襪子", sentence: "They're thirty dollars.", img: IMAGES.socks }
+                ],
+                questions: [
+                    { q: "How much are the pants?", chinese: "這件長褲多少錢？", a: "pants", img: IMAGES.pants },
+                    { q: "They're four hundred and fifty dollars.", chinese: "它們是四百五十元。(指長褲)", a: "fifty", img: IMAGES.pants },
+                    { q: "How much are the socks?", chinese: "這雙襪子多少錢？", a: "socks", img: IMAGES.socks },
+                    { q: "They're thirty dollars.", chinese: "它們是三十元。(指襪子)", a: "thirty", img: IMAGES.socks },
+                    { q: "How much are the sneakers?", chinese: "這雙運動鞋多少錢？", a: "sneakers", img: IMAGES.sneakers },
+                    { q: "They're eight hundred dollars.", chinese: "它們是八百元。(指運動鞋)", a: "eight hundred", img: IMAGES.sneakers },
+                    { q: "How much are the shorts?", chinese: "這件短褲多少錢？", a: "shorts", img: IMAGES.shorts },
+                    { q: "They're two hundred dollars.", chinese: "它們是二百元。(指短褲)", a: "two hundred", img: IMAGES.shorts }
+                ]
+            }
+        ];
+
+        // 應用程式狀態管理
+        let state = {
+            view: 'login',
+            currentLesson: null,
+            quizIndex: 0,
+            answers: [],
+            totalScore: 0,
+            isListening: false,
+            speechResult: '',
+            feedback: null,
+            accuracyScore: 0,
+            fluencyScore: 0,
+            isFinalQuiz: false,
+            finalQuestions: [],
+            errorDetails: '',
+            completedLessons: [],
+            studentInfo: { className: '', seatNumber: '', name: '' },
+            showCertificate: false,
+            isSubmitting: false,
+            isSubmitted: false,
+            submitError: null,
+            vocabTarget: null,
+            vocabSpeechResult: '',
+            vocabAccuracy: 0,
+            vocabFeedback: null,
+            isListeningVocab: false
+        };
+
+        function updateState(newState) {
+            state = { ...state, ...newState };
+            render();
+        }
+
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const confidence = event.results[0][0].confidence;
+                
+                if (state.view === 'study') {
+                    state.vocabSpeechResult = transcript;
+                    calculateVocabScores(transcript, confidence);
+                } else {
+                    state.speechResult = transcript;
+                    calculateScores(transcript, confidence);
+                }
+            };
+
+            recognition.onend = () => {
+                updateState({ isListening: false, isListeningVocab: false });
+            };
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.6;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function startListeningBtn() {
+            if (state.isListening) return; // 防連點
+            
+            updateState({
+                speechResult: '',
+                feedback: null,
+                accuracyScore: 0,
+                fluencyScore: 0,
+                errorDetails: '',
+                isListening: true
+            });
+            if (recognition) {
+                try { recognition.start(); } catch (e) { updateState({ isListening: false }); }
+            } else {
+                alert("您的瀏覽器不支援語音辨識功能，請使用 Google Chrome。");
+                updateState({ isListening: false });
+            }
+        }
+
+        function startVocabListening(word) {
+            if (state.isListeningVocab) return; // 防連點
+            
+            updateState({
+                vocabTarget: word,
+                vocabSpeechResult: '',
+                vocabFeedback: null,
+                vocabAccuracy: 0,
+                isListeningVocab: true
+            });
+            if (recognition) {
+                try { recognition.start(); } catch (e) { updateState({ isListeningVocab: false }); }
+            } else {
+                alert("您的瀏覽器不支援語音辨識功能，請使用 Google Chrome。");
+                updateState({ isListeningVocab: false });
+            }
+        }
+
+        // 單字模式評分
+        function calculateVocabScores(result, confidence) {
+            const targetNoSpace = state.vocabTarget.toLowerCase().replace(/[^a-z0-9]/g, ""); 
+            // 拔除縮寫符號 ' 以免變成空白
+            let processedResult = result.toLowerCase().replace(/'/g, "").replace(/-/g, " ");
+            
+            const wordMappings = [
+                { regex: /\bt shirt\b/gi, val: "tshirt" },
+                { regex: /\bt-shirt\b/gi, val: "tshirt" },
+                { regex: /\bteacher\b/gi, val: "tshirt" },
+                { regex: /\bsnickers\b/gi, val: "sneakers" },
+                { regex: /\bpens\b/gi, val: "pants" },
+                { regex: /\bdirty\b/gi, val: "thirty" }
+            ];
+            
+            wordMappings.forEach(mapping => {
+                processedResult = processedResult.replace(mapping.regex, mapping.val);
+            });
+
+            const noSpaceResult = processedResult.replace(/[^a-z0-9]/g, "");
+
+            let acc = 0;
+            if (noSpaceResult.includes(targetNoSpace)) {
+                acc = 100;
+            } else {
+                const similarity = getSimilarity(targetNoSpace, noSpaceResult);
+                acc = Math.round(similarity * 100);
+                acc = Math.min(acc, 50);
+            }
+
+            if (confidence < 0.8 && acc !== 100) {
+                acc -= Math.round((0.8 - confidence) * 50);
+            }
+            acc = Math.max(0, Math.min(100, acc));
+
+            state.vocabAccuracy = acc;
+            state.vocabFeedback = acc >= 80 ? 'perfect' : 'retry';
+            
+            updateState({});
+        }
+
+        function getSimilarity(s1, s2) {
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length > s2.length ? s2 : s1;
+            if (longer.length === 0) return 1.0;
+            
+            const costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return (longer.length - costs[s2.length]) / longer.length;
+        }
+
+        // 句子模式評分
+        function calculateScores(result, confidence) {
+            const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
+            if (!questionList || !questionList[state.quizIndex]) return;
+
+            const question = questionList[state.quizIndex];
+            
+            // 【重要防護】先移除問句與回答中的單引號，確保 it's 變成 its，而不是被置換成 it s
+            const baseTarget = question.q.toLowerCase().replace(/'/g, "");
+            const baseKeyword = question.a.toLowerCase().replace(/'/g, "");
+            
+            // 句子相似度用的標準格式 (保留空白)
+            const targetForSim = baseTarget.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim(); 
+            // 關鍵字格式
+            const cleanKeyword = baseKeyword.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim(); 
+            
+            let processedResult = result.toLowerCase();
+            // 移除單引號，把連字號換成空白
+            processedResult = processedResult.replace(/'/g, "").replace(/-/g, " ");
+            
+            // 強制精準的正則表達式取代引擎
+            const wordMappings = [
+                { regex: /(?:\$)?900\b/gi, val: "nine hundred" },
+                { regex: /\b9 hundred\b/gi, val: "nine hundred" },
+                { regex: /\bline hundred\b/gi, val: "nine hundred" },
+                
+                { regex: /(?:\$)?800\b/gi, val: "eight hundred" },
+                { regex: /\b8 hundred\b/gi, val: "eight hundred" },
+                
+                { regex: /(?:\$)?500\b/gi, val: "five hundred" },
+                { regex: /\b5 hundred\b/gi, val: "five hundred" },
+                { regex: /\bfire hundred\b/gi, val: "five hundred" },
+                
+                { regex: /(?:\$)?450\b/gi, val: "four hundred and fifty" },
+                { regex: /\b4 hundred 50\b/gi, val: "four hundred and fifty" },
+                { regex: /\b4 hundred and fifty\b/gi, val: "four hundred and fifty" },
+                { regex: /\bfour fifty\b/gi, val: "four hundred and fifty" },
+                { regex: /\bfor fifty\b/gi, val: "four hundred and fifty" },
+                
+                { regex: /(?:\$)?300\b/gi, val: "three hundred" },
+                { regex: /\b3 hundred\b/gi, val: "three hundred" },
+                { regex: /\btree hundred\b/gi, val: "three hundred" },
+                { regex: /\bfree hundred\b/gi, val: "three hundred" },
+                
+                { regex: /(?:\$)?290\b/gi, val: "two hundred and ninety" },
+                { regex: /\b2 hundred 90\b/gi, val: "two hundred and ninety" },
+                { regex: /\b2 hundred and ninety\b/gi, val: "two hundred and ninety" },
+                { regex: /\btwo ninety\b/gi, val: "two hundred and ninety" },
+                
+                { regex: /(?:\$)?200\b/gi, val: "two hundred" },
+                { regex: /\b2 hundred\b/gi, val: "two hundred" },
+                
+                { regex: /(?:\$)?90\b/gi, val: "ninety" },
+                
+                { regex: /(?:\$)?50\b/gi, val: "fifty" },
+                
+                { regex: /(?:\$)?30\b/gi, val: "thirty" },
+                { regex: /\bdirty\b/gi, val: "thirty" },
+                
+                { regex: /\bt shirt\b/gi, val: "tshirt" },
+                { regex: /\bt-shirt\b/gi, val: "tshirt" },
+                { regex: /\bteacher\b/gi, val: "tshirt" },
+                
+                // 處理同音字 They're -> there, their (經過拔除引號處理後為 theyre)
+                { regex: /\bthere\b/gi, val: "theyre" },
+                { regex: /\btheir\b/gi, val: "theyre" }
+            ];
+
+            wordMappings.forEach(mapping => {
+                processedResult = processedResult.replace(mapping.regex, mapping.val);
+            });
+            
+            // 相似度比對用字串 (去掉所有標點符號，保留空白)
+            const cleanResultForSim = processedResult.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+            const paddedResult = " " + cleanResultForSim + " ";
+            const paddedKeyword = " " + cleanKeyword + " ";
+            
+            // 判斷是否包含關鍵字
+            const hasKeyword = paddedResult.includes(paddedKeyword);
+            
+            const isPriceQuestion = targetForSim.includes("dollars");
+
+            let warnings = [];
+
+            // --- 瑕疵抓漏系統 ---
+            if (isPriceQuestion) {
+                // 檢查 It's (已經變成 its)
+                if (/\bits\b/.test(targetForSim)) {
+                    if (/\b(theyre|they are|there|their)\b/.test(cleanResultForSim)) {
+                        warnings.push("單數物品應唸成 It's");
+                    } else if (/\bit is\b/.test(cleanResultForSim)) {
+                        warnings.push("縮寫應唸成 It's");
+                    } else if (!/\bits\b/.test(cleanResultForSim)) {
+                        warnings.push("未聽到 It's");
+                    }
+                }
+                // 檢查 They're (已經變成 theyre)
+                if (/\btheyre\b/.test(targetForSim)) {
+                    if (/\b(its|it is)\b/.test(cleanResultForSim)) {
+                        warnings.push("複數物品應唸成 They're");
+                    } else if (/\bthey are\b/.test(cleanResultForSim)) {
+                        warnings.push("縮寫應唸成 They're");
+                    } else if (!/\b(theyre|there|their)\b/.test(cleanResultForSim)) {
+                        warnings.push("未聽到 They're");
+                    }
+                }
+            }
+
+            // --- 計算分數 ---
+            const similarity = getSimilarity(targetForSim, cleanResultForSim);
+            let acc = Math.round(similarity * 100);
+
+            let flu = Math.round(confidence * 100);
+            const lengthRatio = Math.min(targetForSim.split(' ').length, cleanResultForSim.split(' ').length) / Math.max(targetForSim.split(' ').length, cleanResultForSim.split(' ').length);
+            flu = Math.round(flu * 0.7 + (lengthRatio * 100) * 0.3);
+
+            let detail = "";
+
+            if (isPriceQuestion) {
+                // 如果有唸對數字，保證給過關分數！
+                if (hasKeyword) {
+                    acc = Math.max(85, acc);
+                    flu = Math.max(85, flu);
+
+                    if (warnings.length > 0) {
+                        // 有主詞錯用或未縮寫，扣點分數但不低於 85，並顯示溫馨提醒
+                        acc = Math.min(acc, 90);
+                        detail = `<span class="text-orange-500 font-black">數字正確！</span>但小提醒：${warnings.join("、")}。`;
+                    } else {
+                        // 完全沒漏字，給滿分 100
+                        acc = 100;
+                        flu = 100; 
+                        detail = "太完美了！幾乎沒有錯誤。🌟";
+                    }
+                } else {
+                    acc = Math.min(acc, 50); // 沒唸對數字扣分
+                    detail = `漏掉了關鍵字 "${question.a}"，再試一次！`;
+                }
+            } else {
+                // 一般題目的判斷
+                if (!hasKeyword) {
+                    acc = Math.min(acc, 50); 
+                    detail = `漏掉了關鍵字 "${question.a}"，再試一次！`;
+                } else {
+                    // T-shirt 無敵寬鬆判斷，滿分 100！
+                    if (cleanKeyword === "tshirt") {
+                        acc = 100;
+                        flu = 100;
+                        detail = "太完美了！幾乎沒有錯誤。🌟";
+                    } else {
+                        // 其他單字只要有唸到，給予保障分數
+                        acc = Math.max(70, acc);
+                        if (acc >= 95) { acc = 100; flu = 100; detail = "太完美了！幾乎沒有錯誤。🌟"; }
+                        else if (acc >= 85) detail = "很棒，但有一點點小瑕疵。";
+                        else detail = "發音要再精準一點喔！";
+                    }
+                }
+            }
+
+            if (confidence < 0.8 && acc !== 100) {
+                acc -= Math.round((0.8 - confidence) * 50);
+            }
+            
+            acc = Math.max(0, Math.min(100, acc));
+            flu = Math.max(0, Math.min(100, flu));
+
+            // 回饋訊息：加入醒目的「系統聽見」提示框
+            const heardHtml = `<div class="mt-4 p-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-bold border border-indigo-100 shadow-inner">系統聽見：<span class="text-indigo-800">"${result || '(無聲音)'}"</span></div>`;
+            detail += heardHtml;
+
+            state.accuracyScore = acc;
+            state.fluencyScore = flu;
+            state.errorDetails = detail;
+            state.feedback = acc >= 85 ? 'perfect' : 'retry';
+            
+            updateState({}); // 觸發渲染
+        }
+
+        // 修改：重講一次時強制清除狀態並停止語音辨識
+        function retryQuestion() { 
+            if (recognition) {
+                try { recognition.stop(); } catch (e) {}
+            }
+            updateState({ feedback: null, speechResult: '' }); 
+        }
+
+        function nextQuestion(acc, flu, finalResult) {
+            const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
+            if (!questionList || !questionList[state.quizIndex]) return;
+
+            const avgScore = Math.round((acc + flu) / 2);
+            state.answers.push({ 
+                question: questionList[state.quizIndex].q,
+                userAnswer: finalResult || state.speechResult,
+                acc: acc,
+                flu: flu,
+                score: avgScore
+            });
+            
+            state.feedback = null;
+            state.speechResult = '';
+            state.errorDetails = '';
+
+            if (state.quizIndex < questionList.length - 1) {
+                state.quizIndex++;
+            } else {
+                const sum = state.answers.reduce((s, curr) => s + curr.score, 0);
+                const avg = Math.round(sum / state.answers.length);
+                state.totalScore = avg;
+                
+                if (avg >= 85 && state.currentLesson) { 
+                    if (!state.completedLessons.includes(state.currentLesson.id)) {
+                        state.completedLessons.push(state.currentLesson.id);
+                    }
+                }
+                
+                state.view = 'result';
+                state.showCertificate = false;
+                state.isSubmitted = false;
+                state.submitError = null;
+            }
+            updateState({});
+        }
+
+        function startFinalChallenge() {
+            const allQuestions = [...LESSONS[0].questions, ...LESSONS[1].questions];
+            const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
+            updateState({
+                finalQuestions: shuffled,
+                isFinalQuiz: true,
+                currentLesson: { id: 99, title: "Final Challenge", subtitle: "第三課總複習", questions: shuffled },
+                quizIndex: 0,
+                answers: [],
+                view: 'quiz' 
+            });
+        }
+
+        async function submitToGoogleSheet() {
+            if (!state.studentInfo.name || !state.studentInfo.className || !state.studentInfo.seatNumber) return;
+            
+            updateState({ isSubmitting: true, submitError: null });
+            
+            const avgAcc = Math.round(state.answers.reduce((s, a) => s + a.acc, 0) / state.answers.length);
+            const avgFlu = Math.round(state.answers.reduce((s, a) => s + a.flu, 0) / state.answers.length);
+
+            const payload = {
+                className: state.studentInfo.className,
+                seatNumber: state.studentInfo.seatNumber,
+                name: state.studentInfo.name,
+                totalScore: state.totalScore,
+                accuracy: avgAcc,
+                fluency: avgFlu,
+                timestamp: new Date().toLocaleString()
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                updateState({ isSubmitted: true, isSubmitting: false });
+                setTimeout(() => updateState({ showCertificate: true }), 1200);
+            } catch (error) {
+                updateState({ 
+                    submitError: "傳送失敗，請確認 Script 權限是否設為「任何人」。",
+                    isSubmitting: false 
+                });
+            }
+        }
+
+        // ===== 視圖渲染邏輯 =====
+        
+        function setView(view) { updateState({ view }); }
+        function startStudy(id) { updateState({ isFinalQuiz: false, currentLesson: LESSONS.find(l => l.id === id), view: 'study' }); }
+        function startQuiz(id) { updateState({ isFinalQuiz: false, currentLesson: LESSONS.find(l => l.id === id), quizIndex: 0, answers: [], view: 'quiz' }); }
+        function submitNextQuestion() { nextQuestion(state.accuracyScore, state.fluencyScore, state.speechResult); }
+        function checkSubmitReady() {
+            const btn = document.getElementById('submitBtn');
+            if (btn) btn.disabled = !state.studentInfo.name || state.isSubmitting;
+        }
+
+        function enterSystem() {
+            if (state.studentInfo.className && state.studentInfo.seatNumber && state.studentInfo.name) {
+                setView('home');
+            }
+        }
+
+        function renderLoginBtn() {
+            const btn = document.getElementById('loginBtn');
+            if (btn) {
+                btn.disabled = !state.studentInfo.className || !state.studentInfo.seatNumber || !state.studentInfo.name;
+            }
+        }
+
+        function renderLogin() {
+            return `
+                <div class="max-w-md mx-auto p-6 pt-16 animate-zoom-in">
+                    <div class="bg-white rounded-[40px] shadow-2xl p-10 text-center border-t-8 border-indigo-600">
+                        <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-600 shadow-inner">
+                            <i data-lucide="user" class="w-10 h-10"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-slate-800 mb-2">登入系統</h2>
+                        <p class="text-slate-500 font-bold mb-8">請先輸入你的基本資料再開始練習</p>
+                        
+                        <div class="space-y-4 mb-8 text-left">
+                            <div>
+                                <label class="text-xs font-black text-slate-400 ml-2 mb-1 block uppercase tracking-wider">班級 Class</label>
+                                <input type="text" value="${state.studentInfo.className}" oninput="state.studentInfo.className = this.value; renderLoginBtn();" placeholder="例如: 501" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold outline-none focus:border-indigo-400 focus:bg-white transition-colors" />
+                            </div>
+                            <div>
+                                <label class="text-xs font-black text-slate-400 ml-2 mb-1 block uppercase tracking-wider">座號 Number</label>
+                                <input type="number" value="${state.studentInfo.seatNumber}" oninput="state.studentInfo.seatNumber = this.value; renderLoginBtn();" placeholder="例如: 5" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold outline-none focus:border-indigo-400 focus:bg-white transition-colors" />
+                            </div>
+                            <div>
+                                <label class="text-xs font-black text-slate-400 ml-2 mb-1 block uppercase tracking-wider">姓名 Name</label>
+                                <input type="text" value="${state.studentInfo.name}" oninput="state.studentInfo.name = this.value; renderLoginBtn();" placeholder="請輸入姓名" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold outline-none focus:border-indigo-400 focus:bg-white transition-colors" />
+                            </div>
+                        </div>
+
+                        <button id="loginBtn" onclick="enterSystem()" ${(!state.studentInfo.className || !state.studentInfo.seatNumber || !state.studentInfo.name) ? 'disabled' : ''} class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200">
+                            進入闖關 <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHome() {
+            let lessonsHtml = LESSONS.map(lesson => {
+                const isCompleted = state.completedLessons.includes(lesson.id);
+                return `
+                    <div class="bg-white rounded-3xl shadow-md border-b-4 p-8 hover:translate-y-[-4px] transition-all ${isCompleted ? 'border-amber-300' : 'border-indigo-100'}">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <h2 class="text-2xl font-black text-gray-800">${lesson.title}</h2>
+                                <p class="text-indigo-400 font-bold">${lesson.subtitle}</p>
+                            </div>
+                            <div class="p-3 rounded-2xl ${isCompleted ? 'bg-amber-100 text-amber-500' : 'bg-slate-100 text-slate-300'}">
+                                <i data-lucide="star" ${isCompleted ? 'class="fill-current"' : ''}></i>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="startStudy(${lesson.id})" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200">1. 認識單字</button>
+                            <button onclick="startQuiz(${lesson.id})" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 flex items-center justify-center gap-2">
+                                <i data-lucide="mic" class="w-5 h-5"></i> 2. 開始闖關
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="max-w-2xl mx-auto p-6 animate-zoom-in">
+                    <header class="text-center mb-10">
+                        <h1 class="text-4xl font-black text-indigo-600 mb-2 flex items-center justify-center gap-2">
+                            <i data-lucide="heart" class="text-red-400 fill-current"></i> English Fun
+                        </h1>
+                        <p class="text-slate-500 font-bold italic">G5 Book6 Unit3 聽說練習闖關</p>
+                    </header>
+                    <div class="grid gap-6 mb-10">
+                        ${lessonsHtml}
+                    </div>
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[40px] p-8 text-white shadow-xl relative overflow-hidden group mb-6">
+                        <div class="relative z-10 text-center">
+                            <h2 class="text-3xl font-black mb-4 flex items-center justify-center gap-3"><i data-lucide="trophy" class="text-amber-400"></i> 混合總測驗</h2>
+                            <button onclick="startFinalChallenge()" class="w-full bg-white text-indigo-600 py-5 rounded-3xl font-black text-xl shadow-lg hover:bg-amber-400 hover:text-white transition-all flex items-center justify-center gap-3">
+                                <i data-lucide="play-circle"></i> 開始挑戰
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="setView('preview')" class="w-full bg-slate-200 text-slate-600 py-4 rounded-3xl font-bold hover:bg-slate-300 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="eye" class="w-5 h-5"></i> 預覽所有題目與解答
+                    </button>
+                </div>
+            `;
+        }
+        
+        function renderPreview() {
+             let previewHtml = LESSONS.map(lesson => {
+                let questionsHtml = lesson.questions.map((q, idx) => `
+                    <div class="bg-white p-4 rounded-2xl mb-3 shadow-sm border border-slate-100 flex items-start gap-4">
+                         <div class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-black shrink-0">${idx + 1}</div>
+                         <div class="flex-1">
+                             <p class="font-black text-lg text-slate-800">${q.q}</p>
+                             <p class="text-slate-500 text-sm mb-2">${q.chinese}</p>
+                             <div class="inline-block bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded font-bold">
+                                評分關鍵字：${q.a}
+                             </div>
+                         </div>
+                         <img src="${q.img}" class="w-20 h-20 object-cover rounded-lg shrink-0" onerror="this.style.display='none'">
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="mb-8">
+                        <h3 class="text-xl font-black text-indigo-600 mb-4 px-2 border-l-4 border-indigo-600">${lesson.title}</h3>
+                        ${questionsHtml}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="max-w-2xl mx-auto p-6 animate-zoom-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-black text-slate-800">所有題目預覽</h2>
+                        <button onclick="setView('home')" class="bg-white px-4 py-2 rounded-xl shadow-sm text-indigo-600 font-black border border-indigo-100">返回</button>
+                    </div>
+                    <div class="bg-slate-50 rounded-[40px] p-6 shadow-inner">
+                        ${previewHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStudy() {
+            let vocabHtml = state.currentLesson.vocabulary.map(v => {
+                const wordEscaped = v.word.replace(/'/g, "\\'");
+                const isTarget = state.vocabTarget === v.word;
+                const isListeningThis = isTarget && state.isListeningVocab;
+                
+                let feedbackUI = '';
+                if (isTarget && state.vocabFeedback) {
+                    const isGood = state.vocabAccuracy >= 80;
+                    feedbackUI = `
+                        <div class="mt-3 p-3 rounded-xl ${isGood ? 'bg-emerald-50 border border-emerald-100' : 'bg-orange-50 border border-orange-100'} flex items-center justify-between animate-zoom-in">
+                            <div class="flex items-center gap-2">
+                                ${isGood ? '<i data-lucide="check-circle" class="text-emerald-500 w-5 h-5"></i>' : '<i data-lucide="alert-circle" class="text-orange-500 w-5 h-5"></i>'}
+                                <span class="font-bold ${isGood ? 'text-emerald-600' : 'text-orange-600'} text-sm md:text-base">
+                                    ${isGood ? '發音很棒！' : '再試一次！'} 
+                                    <span class="text-xs ml-2 opacity-70">系統聽見: "${state.vocabSpeechResult}"</span>
+                                </span>
+                            </div>
+                            <div class="font-black ${isGood ? 'text-emerald-500' : 'text-orange-500'}">${state.vocabAccuracy}分</div>
+                        </div>
+                    `;
+                }
+
+                return `
+                <div class="bg-slate-50 p-4 rounded-[30px] flex flex-col border ${isTarget ? 'border-indigo-400 shadow-md' : 'border-slate-100 hover:border-indigo-200'} transition-all gap-2">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 text-left">
+                            <img src="${v.img}" alt="${v.word}" class="w-20 h-20 object-cover rounded-2xl shadow-sm bg-white" onerror="this.style.display='none'">
+                            <div>
+                                <h3 class="text-2xl font-black text-indigo-600">${v.word}</h3>
+                                <p class="text-slate-400 font-bold">${v.chinese}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="speak('${wordEscaped}')" class="w-14 h-14 bg-white rounded-2xl text-indigo-600 flex items-center justify-center shadow-sm border border-indigo-50 hover:bg-indigo-50 transition-colors" title="聆聽發音">
+                                <i data-lucide="volume-2" class="w-6 h-6"></i>
+                            </button>
+                            <button onclick="startVocabListening('${wordEscaped}')" class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm border transition-all ${isListeningThis ? 'bg-red-500 text-white border-red-500 animate-pulse' : 'bg-white text-emerald-500 border-emerald-50 hover:bg-emerald-50'}" title="口說練習">
+                                <i data-lucide="mic" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ${feedbackUI}
+                </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="max-w-2xl mx-auto p-6 text-center animate-zoom-in">
+                    <button onclick="setView('home')" class="bg-white px-8 py-3 rounded-2xl shadow-sm text-indigo-600 font-black mb-6 border border-indigo-100 flex items-center justify-center gap-2 mx-auto hover:bg-slate-50 transition-colors">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i> 返回主選單
+                    </button>
+                    <div class="bg-white rounded-[40px] p-8 shadow-sm">
+                        <h2 class="text-3xl font-black text-slate-800 mb-2">${state.currentLesson.title}</h2>
+                        <p class="text-slate-500 font-bold mb-8">點擊麥克風 🎤 測試你的單字發音！</p>
+                        <div class="grid gap-4">
+                            ${vocabHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuiz() {
+            const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
+            if (!questionList || !questionList[state.quizIndex]) return '';
+            
+            const question = questionList[state.quizIndex];
+            const progress = ((state.quizIndex + 1) / questionList.length) * 100;
+
+            let feedbackHtml = '';
+            if (state.feedback) {
+                const isGood = state.accuracyScore >= 85;
+                feedbackHtml = `
+                    <div class="absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center animate-zoom-in px-8 rounded-[40px]">
+                        <div class="mb-4">
+                            ${isGood 
+                                ? '<div class="bg-emerald-100 text-emerald-600 p-4 rounded-full"><i data-lucide="check-circle" class="w-16 h-16"></i></div>' 
+                                : '<div class="bg-orange-100 text-orange-600 p-4 rounded-full"><i data-lucide="alert-circle" class="w-16 h-16"></i></div>'}
+                        </div>
+                        <h3 class="text-2xl font-black mb-1">${isGood ? "做得好！" : "再試一次"}</h3>
+                        <div class="flex gap-4 mb-2">
+                            <div class="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                                <span class="text-[10px] font-black text-slate-400 block uppercase tracking-tighter">準確度</span>
+                                <span class="text-xl font-black ${isGood ? 'text-emerald-500' : 'text-orange-400'}">${state.accuracyScore}%</span>
+                            </div>
+                            <div class="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                                <span class="text-[10px] font-black text-slate-400 block uppercase tracking-tighter">流暢度</span>
+                                <span class="text-xl font-black text-indigo-500">${state.fluencyScore}%</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-500 font-bold mb-2 text-sm leading-relaxed">${state.errorDetails}</p>
+                        <div class="flex w-full gap-4 mt-2">
+                            <button onclick="retryQuestion()" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-black hover:bg-slate-200">重講一次</button>
+                            <button onclick="submitNextQuestion()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700">下一題</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let imageHtml = '';
+            if (question.img) {
+                 imageHtml = `<img src="${question.img}" onerror="this.style.display='none'" class="w-full max-h-56 object-cover rounded-2xl mb-6 border border-slate-100 shadow-sm" alt="題目圖片" />`;
+            }
+
+            return `
+                <div class="max-w-xl mx-auto p-4 animate-zoom-in">
+                    <div class="mb-6">
+                        <div class="flex justify-between text-xs font-black text-indigo-400 mb-2 uppercase">
+                            <span>${state.isFinalQuiz ? "🏆 FINAL CHALLENGE" : "✍️ PRACTICE"}</span>
+                            <span>${state.quizIndex + 1} / ${questionList.length}</span>
+                        </div>
+                        <div class="w-full bg-white h-4 rounded-full p-1 shadow-inner">
+                            <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-[40px] shadow-xl p-8 border border-gray-50 text-center relative overflow-hidden min-h-[500px] flex flex-col justify-center">
+                        ${feedbackHtml}
+                        
+                        ${imageHtml}
+                        
+                        <div class="mb-6 flex flex-col items-center">
+                            <button onclick="speak('${question.q.replace(/'/g, "\\'")}')" class="w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border-2 border-indigo-100">
+                                <i data-lucide="volume-2"></i>
+                            </button>
+                        </div>
+                        <div class="mb-8">
+                            <h2 class="text-4xl font-black text-indigo-600 mb-2 leading-tight">${question.q}</h2>
+                            <p class="text-xl font-bold text-slate-400">${question.chinese}</p>
+                        </div>
+                        
+                        <div class="mb-10 min-h-[80px] bg-slate-50 rounded-3xl p-4 flex items-center justify-center border-2 border-slate-100 border-dashed">
+                            ${state.isListening
+                                ? '<div class="flex gap-2 items-center"><span class="w-3 h-3 bg-red-500 rounded-full animate-ping"></span><span class="text-slate-500 font-bold">聆聽中...</span></div>'
+                                : `<p class="text-slate-600 font-bold text-lg">${state.speechResult || '<span class="text-slate-300">請點擊麥克風開始說話</span>'}</p>`
+                            }
+                        </div>
+                        <button onclick="startListeningBtn()" ${state.isListening ? 'disabled' : ''} class="w-24 h-24 mx-auto rounded-full ${state.isListening ? 'bg-red-500 shadow-red-200 cursor-not-allowed' : 'bg-indigo-600 shadow-indigo-200 hover:scale-105'} text-white shadow-xl flex items-center justify-center transition-all transform ${state.isListening ? 'animate-pulse' : ''}">
+                            <i data-lucide="mic" class="w-10 h-10"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderResult() {
+            if (state.showCertificate) {
+                return `
+                    <div class="max-w-xl mx-auto p-6 text-center animate-zoom-in">
+                        <div class="bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 p-2 rounded-[40px] shadow-2xl">
+                            <div class="bg-white rounded-[32px] p-10 border-8 border-white/20">
+                                <i data-lucide="award" class="w-24 h-24 text-amber-500 mx-auto mb-6"></i>
+                                <h1 class="text-4xl font-black text-slate-800 mb-2">恭喜完成挑戰！</h1>
+                                <p class="text-xl text-slate-500 font-bold mb-8">G5 Book6 Unit3 聽說練習闖關</p>
+                                <div class="bg-amber-50 rounded-2xl p-6 mb-8 text-left inline-block w-full">
+                                    <p class="font-bold text-slate-600 mb-2">班級：<span class="text-xl text-amber-600 ml-2">${state.studentInfo.className} 班</span></p>
+                                    <p class="font-bold text-slate-600 mb-2">座號：<span class="text-xl text-amber-600 ml-2">${state.studentInfo.seatNumber} 號</span></p>
+                                    <p class="font-bold text-slate-600 mb-2">姓名：<span class="text-xl text-amber-600 ml-2">${state.studentInfo.name}</span></p>
+                                    <p class="font-bold text-slate-600">總分：<span class="text-3xl font-black text-amber-600 ml-2">${state.totalScore}</span></p>
+                                </div>
+                                <button onclick="setView('home')" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black text-lg hover:bg-slate-900 transition-colors shadow-lg">
+                                    返回主畫面
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            let resultItems = state.answers.map((ans, i) => `
+                <div class="bg-slate-50 rounded-2xl p-4 mb-3 flex items-center justify-between border border-slate-100">
+                    <div class="flex items-center gap-4 text-left flex-1">
+                        <div class="w-8 h-8 rounded-full bg-white text-slate-400 flex items-center justify-center font-black shadow-sm shrink-0">${i + 1}</div>
+                        <div>
+                            <p class="font-black text-slate-700 text-sm md:text-base">${ans.question}</p>
+                            <p class="text-indigo-500 font-bold text-sm">Your answer: ${ans.userAnswer || '(未辨識)'}</p>
+                        </div>
+                    </div>
+                    <div class="text-right pl-4">
+                        <div class="text-xl font-black ${ans.score >= 85 ? 'text-emerald-500' : 'text-orange-400'}">${ans.score}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="max-w-2xl mx-auto p-4 animate-zoom-in">
+                    <div class="bg-white rounded-[40px] shadow-xl p-8 text-center border-t-8 border-indigo-600">
+                        <div class="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg ${state.totalScore >= 85 ? 'bg-emerald-100 text-emerald-500' : 'bg-amber-100 text-amber-500'}">
+                            <i data-lucide="${state.totalScore >= 85 ? 'star' : 'target'}" class="w-12 h-12 fill-current"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-slate-800 mb-2">測驗結果</h2>
+                        <div class="text-6xl font-black mb-8 ${state.totalScore >= 85 ? 'text-emerald-500' : 'text-amber-500'}">${state.totalScore}<span class="text-2xl text-slate-400 ml-2">分</span></div>
+                        
+                        <div class="mb-8 max-h-[400px] overflow-y-auto pr-2">
+                            ${resultItems}
+                        </div>
+
+                        ${state.isFinalQuiz 
+                            ? `
+                                ${state.isSubmitted 
+                                    ? `<p class="text-emerald-600 font-black mb-4 bg-emerald-50 p-4 rounded-xl">✅ 成績已成功送出！</p>` 
+                                    : `<button id="submitBtn" onclick="submitToGoogleSheet()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 mb-4">
+                                        ${state.isSubmitting ? '送出中...' : '<i data-lucide="send"></i> 送出成績至雲端'}
+                                       </button>`
+                                }
+                                ${state.submitError ? `<p class="text-red-500 font-bold mb-4 text-sm bg-red-50 p-3 rounded-lg">${state.submitError}</p>` : ''}
+                                
+                                <button onclick="setView('home')" class="w-full bg-slate-100 text-slate-600 py-4 rounded-2xl font-black text-lg hover:bg-slate-200 transition-colors">
+                                    返回主選單
+                                </button>
+                              `
+                            : `<button onclick="setView('home')" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">完成練習</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            let content = '';
+
+            switch (state.view) {
+                case 'login': content = renderLogin(); break;
+                case 'home': content = renderHome(); break;
+                case 'preview': content = renderPreview(); break;
+                case 'study': content = renderStudy(); break;
+                case 'quiz': content = renderQuiz(); break;
+                case 'result': content = renderResult(); break;
+            }
+
+            app.innerHTML = `
+                <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-indigo-100/50 shadow-sm">
+                    <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+                        <div class="flex items-center gap-2 text-indigo-600 font-black text-xl tracking-tight cursor-pointer" onclick="if(state.studentInfo.name) setView('home')">
+                            <i data-lucide="graduation-cap"></i>
+                            English Fun
+                        </div>
+                        ${state.studentInfo.name && state.view !== 'login' ? `
+                            <div class="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-full border border-indigo-100">
+                                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                <span class="text-sm font-bold text-indigo-600">${state.studentInfo.className}班 ${state.studentInfo.seatNumber}號 ${state.studentInfo.name}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </nav>
+                <main class="min-h-[calc(100vh-80px)] pt-6">
+                    ${content}
+                </main>
+            `;
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+            
+            checkSubmitReady();
+        }
+
+        render();
+    </script>
+</body>
+</html>
