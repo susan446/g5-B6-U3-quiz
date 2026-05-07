@@ -205,9 +205,49 @@
             }
         }
 
+        // ✅ 新增：強大的語音辨識正規化工具 (處理數字、金錢符號與常見同音錯字)
+        function normalizeSpeechText(text) {
+            let t = text.toLowerCase();
+            
+            // 1. 處理美金符號：將 "$500" 轉成 "500 dollars"
+            t = t.replace(/\$(\d+)/g, "$1 dollars");
+            
+            // 2. 數字與常見錯誤強制替換表 (針對本課單字客製化)
+            const map = {
+                "900": "nine hundred",
+                "290": "two hundred and ninety",
+                "500": "five hundred",
+                "300": "three hundred",
+                "450": "four hundred and fifty",
+                "415": "four hundred and fifty", // 針對您截圖中的辨識錯誤進行容錯
+                "30": "thirty",
+                "13": "thirty", // 常見發音誤判
+                "800": "eight hundred",
+                "200": "two hundred",
+                "dirty": "thirty", // 常見發音誤判
+                "teacher": "t-shirt",
+                "t shirt": "t-shirt",
+                "their": "theyre",
+                "there": "theyre",
+                "they re": "theyre"
+            };
+            
+            for (let key in map) {
+                // 使用正則邊界，確保只替換獨立的單字
+                let regex = new RegExp("\\b" + key + "\\b", "g");
+                t = t.replace(regex, map[key]);
+            }
+            
+            // 3. 處理縮寫與連字號
+            t = t.replace(/'/g, "");
+            t = t.replace(/-/g, " ");
+            
+            return t.trim();
+        }
+
         function calculateVocabScores(result, confidence) {
             const targetNoSpace = state.vocabTarget.toLowerCase().replace(/[^a-z0-9]/g, ""); 
-            let processedResult = result.toLowerCase().replace(/'/g, "").replace(/-/g, " ");
+            let processedResult = normalizeSpeechText(result); // 使用新的正規化工具
             const noSpaceResult = processedResult.replace(/[^a-z0-9]/g, "");
             let acc = noSpaceResult.includes(targetNoSpace) ? 100 : Math.round(getSimilarity(targetNoSpace, noSpaceResult) * 100);
             state.vocabAccuracy = acc;
@@ -242,19 +282,31 @@
         function calculateScores(result, confidence) {
             const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
             const question = questionList[state.quizIndex];
+            
+            // 處理標準答案
             const baseTarget = question.q.toLowerCase().replace(/'/g, "");
             const targetForSim = baseTarget.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim(); 
-            let processedResult = result.toLowerCase().replace(/'/g, "").replace(/-/g, " ");
+            
+            // 處理學生語音 (使用新的正規化工具)
+            let processedResult = normalizeSpeechText(result);
             const cleanResultForSim = processedResult.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
             
             const similarity = getSimilarity(targetForSim, cleanResultForSim);
             let acc = Math.round(similarity * 100);
             let flu = Math.round(confidence * 100);
             
+            // 針對特定縮寫的溫馨提醒 (若包含在目標句但學生沒唸出)
+            let extraMsg = "";
+            if (targetForSim.includes("its ") && !cleanResultForSim.includes("its ")) extraMsg = " (提醒：系統未聽到 It's)";
+            if (targetForSim.includes("theyre ") && !cleanResultForSim.includes("theyre ")) extraMsg = " (提醒：系統未聽到 They're)";
+
             state.accuracyScore = acc;
             state.fluencyScore = flu;
-            state.errorDetails = `系統聽見："${result || '(無聲音)'}"`;
-            state.feedback = acc >= 85 ? 'perfect' : 'retry';
+            
+            // 將系統真實聽到的原文與提醒顯示出來
+            let extraMsgHtml = extraMsg ? `<br><span class="text-sm text-orange-500">${extraMsg}</span>` : "";
+            state.errorDetails = `系統聽見："${result || '(無聲音)'}"${extraMsgHtml}`;
+            state.feedback = acc >= 80 ? 'perfect' : 'retry'; // 放寬標準至 80 分
             updateState({}); 
         }
 
