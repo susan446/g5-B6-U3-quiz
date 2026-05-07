@@ -205,26 +205,26 @@
             }
         }
 
-        // ✅ 新增：強大的語音辨識正規化工具 (處理數字、金錢符號與常見同音錯字)
+        // ✅ 更新版：強大的語音辨識正規化工具 (自動補全 dollars，解決漏字與數字誤判問題)
         function normalizeSpeechText(text) {
             let t = text.toLowerCase();
             
-            // 1. 處理美金符號：將 "$500" 轉成 "500 dollars"
-            t = t.replace(/\$(\d+)/g, "$1 dollars");
+            // 1. 去除美金符號
+            t = t.replace(/\$/g, "");
             
-            // 2. 數字與常見錯誤強制替換表 (針對本課單字客製化)
+            // 2. 數字與常見錯誤強制替換表 (直接將數字對應到包含 dollars 的完整詞彙)
             const map = {
-                "900": "nine hundred",
-                "290": "two hundred and ninety",
-                "500": "five hundred",
-                "300": "three hundred",
-                "450": "four hundred and fifty",
-                "415": "four hundred and fifty", // 針對您截圖中的辨識錯誤進行容錯
-                "30": "thirty",
-                "13": "thirty", // 常見發音誤判
-                "800": "eight hundred",
-                "200": "two hundred",
-                "dirty": "thirty", // 常見發音誤判
+                "900": "nine hundred dollars",
+                "290": "two hundred and ninety dollars",
+                "500": "five hundred dollars",
+                "300": "three hundred dollars",
+                "450": "four hundred and fifty dollars",
+                "415": "four hundred and fifty dollars", // 容錯辨識
+                "30": "thirty dollars",
+                "13": "thirty dollars", // 常見誤判
+                "800": "eight hundred dollars",
+                "200": "two hundred dollars",
+                "dirty": "thirty",
                 "teacher": "t-shirt",
                 "t shirt": "t-shirt",
                 "their": "theyre",
@@ -233,12 +233,14 @@
             };
             
             for (let key in map) {
-                // 使用正則邊界，確保只替換獨立的單字
                 let regex = new RegExp("\\b" + key + "\\b", "g");
                 t = t.replace(regex, map[key]);
             }
             
-            // 3. 處理縮寫與連字號
+            // 3. 避免學生真的有唸 dollars，替換後變成重複的 dollars dollars，做個修剪
+            t = t.replace(/dollars dollars/g, "dollars");
+            
+            // 4. 處理縮寫與連字號
             t = t.replace(/'/g, "");
             t = t.replace(/-/g, " ");
             
@@ -450,10 +452,14 @@
                     <div class="bg-white rounded-[40px] shadow-xl p-8 text-center relative overflow-hidden min-h-[500px] flex flex-col justify-center">
                         ${state.feedback ? `
                             <div class="absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-8 rounded-[40px]">
-                                <h3 class="text-2xl font-black mb-4">${state.accuracyScore >= 85 ? "做得好！" : "再試一次"}</h3>
+                                <h3 class="text-3xl font-black mb-2">${state.accuracyScore >= 80 ? "做得好！ 🎉" : "再試一次 💪"}</h3>
+                                
+                                <!-- ✅ 新增：把分數大大的顯示出來 -->
+                                <div class="text-2xl font-black text-amber-500 mb-4">得分：${state.accuracyScore} 分</div>
+                                
                                 <p class="text-indigo-600 font-bold mb-8">${state.errorDetails}</p>
                                 <div class="flex w-full gap-4">
-                                    <button onclick="retryQuestion()" class="flex-1 bg-slate-100 py-4 rounded-2xl font-black">重講一次</button>
+                                    <button onclick="retryQuestion()" class="flex-1 bg-slate-100 py-4 rounded-2xl font-black text-slate-600">重講一次</button>
                                     <button onclick="submitNextQuestion()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black">下一題</button>
                                 </div>
                             </div>
