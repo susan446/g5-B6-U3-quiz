@@ -782,7 +782,15 @@
             };
 
             rec.onend = () => {
-                // 由手動停止按鈕統一處理狀態
+                // 防呆機制：確保只有在「按下停止按鈕」時才真正停止。
+                // 若系統因為太久沒講話(靜音)而自動觸發 onend，則強制重啟。
+                if (isRecording) {
+                    try {
+                        rec.start(); 
+                    } catch (e) {
+                        console.log("Speech restart error", e);
+                    }
+                }
             };
 
             return rec;
@@ -1018,10 +1026,10 @@
             const item = currentScriptList[currentIndex];
             window.speechSynthesis.cancel(); // Stop active audio
 
-            // 修復 Shhh 發音過短問題，讓語音拉長
+            // 修復 Shhh 發音過短或被唸成字母的問題，改用 Shh... 讓語音引擎發出標準氣音
             let speakText = item.text;
             if (speakText.includes("Shhh!")) {
-                speakText = speakText.replace("Shhh!", "Shhhhhhhhh!");
+                speakText = speakText.replace(/Shhh!/g, "Shh... ");
             }
 
             const utterance = new SpeechSynthesisUtterance(speakText);
