@@ -2,523 +2,1290 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G5 Book6 Unit3 聽說練習闖關</title>
-    
-    <!-- 引入 Tailwind CSS 進行排版與設計 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Secret Treasure of Eco Island - RT 英語朗讀劇比賽特訓系統</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 引入 Lucide Icons 圖示庫 -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- 自訂動畫與列印樣式 -->
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        @keyframes zoom-in {
-            0% { opacity: 0; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1); }
+        body {
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #065f46 100%);
+            min-height: 100vh;
+            color: #f8fafc;
         }
-        .animate-zoom-in {
-            animation: zoom-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        @media print {
-            body { background: white !important; }
-            nav { display: none !important; }
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-glow {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+            transform: translateY(-2px);
+        }
+        .mic-pulse {
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .floating-tag {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
         }
     </style>
 </head>
-<body class="bg-indigo-50/30 font-sans text-gray-900 pb-12 min-h-screen">
+<body class="flex flex-col min-h-screen relative overflow-x-hidden">
 
-    <div id="app"></div>
+    <!-- Ambient Background Elements -->
+    <div class="fixed top-10 left-10 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="fixed bottom-10 right-10 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Top Header -->
+    <header class="w-full py-4 px-6 glass-card flex justify-between items-center z-20 border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 to-teal-600 flex items-center justify-center text-xl font-bold shadow-lg">
+                🏝️
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300">
+                    The Secret Treasure of Eco Island
+                </h1>
+                <p class="text-xs text-emerald-200/70">RT 英語朗讀劇大賽特訓平台 (ASUS / iPad 相容版)</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Developer Mode Badge -->
+            <span id="previewBadge" class="hidden px-3 py-1 bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs rounded-full font-semibold items-center gap-1">
+                <i class="fa-solid fa-code"></i> 老師預覽模式
+            </span>
+            <!-- Developer Gear Button -->
+            <button id="devGearBtn" onclick="openDevModal()" class="hidden w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/20">
+                <i class="fa-solid fa-gear text-lg text-emerald-300"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center relative z-10">
+
+        <!-- SCREEN 1: Student Login & Role Selection Screen -->
+        <section id="loginScreen" class="w-full max-w-xl mx-auto glass-card rounded-3xl p-6 md:p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-xs font-bold tracking-wider">COMPETITION TRAINING</span>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-white">學生登入與角色選擇</h2>
+                <p class="text-slate-300 text-sm">請輸入基本資料，並選擇你在 RT 朗讀劇中飾演的角色：</p>
+            </div>
+
+            <!-- Login Inputs -->
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-emerald-200 mb-1">班級 (Class)</label>
+                    <input type="text" id="studentClass" placeholder="如 501" class="w-full px-3 py-2.5 rounded-xl bg-slate-900/60 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-emerald-200 mb-1">座號 (No.)</label>
+                    <input type="number" id="studentSeat" placeholder="如 12" class="w-full px-3 py-2.5 rounded-xl bg-slate-900/60 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-emerald-200 mb-1">姓名 (Name)</label>
+                    <input type="text" id="studentName" placeholder="如 Kevin" class="w-full px-3 py-2.5 rounded-xl bg-slate-900/60 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-emerald-400">
+                </div>
+            </div>
+
+            <!-- Character Selection Grid -->
+            <div>
+                <label class="block text-xs font-medium text-emerald-200 mb-2">選擇練習角色 (Choose Role):</label>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="characterPicker">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Google Sheets Apps Script URL Settings (Optional for teacher) -->
+            <div class="pt-2 border-t border-white/10">
+                <details class="text-xs text-slate-400 cursor-pointer">
+                    <summary class="hover:text-emerald-300 transition-colors">⚙️ 高級設定：Google 試算表 Web App 網址 (選擇性)</summary>
+                    <div class="mt-2 space-y-2">
+                        <input type="url" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 rounded-lg bg-slate-900/80 border border-white/10 text-white text-xs">
+                        <p class="text-[10px] text-slate-400">填入後，學生的特訓成績將會自動同步儲存至該試算表中。</p>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-3 pt-2">
+                <button onclick="startPractice(false)" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-2xl shadow-lg btn-glow flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-play"></i> 開始進行比賽特訓
+                </button>
+
+                <button onclick="startPractice(true)" class="w-full py-2.5 bg-slate-800/80 hover:bg-slate-700/80 text-amber-300 font-semibold rounded-2xl border border-amber-500/30 text-xs flex items-center justify-center gap-2 transition-all">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 老師快速開發預覽模式 (免輸入資料)
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: Interactive Practice Room Stage -->
+        <section id="practiceRoom" class="hidden w-full glass-card rounded-3xl p-4 md:p-6 space-y-6 relative">
+            
+            <!-- Stage Top Bar Info -->
+            <div class="flex justify-between items-center bg-slate-900/40 p-3 rounded-2xl border border-white/10">
+                <div class="flex items-center gap-3">
+                    <div id="roleAvatar" class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-2xl shadow-inner">
+                        🦁
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="stageRoleName" class="font-bold text-white text-base">Leo</span>
+                            <span id="stageSceneTag" class="px-2 py-0.5 bg-indigo-500/30 text-indigo-200 text-xs rounded-full">Scene 1</span>
+                        </div>
+                        <p id="studentInfoTag" class="text-xs text-emerald-300">501 - 12號 Kevin</p>
+                    </div>
+                </div>
+
+                <!-- Progress Counter -->
+                <div class="text-right">
+                    <span class="text-xs text-slate-400">關卡進度</span>
+                    <div class="text-lg font-black text-emerald-300" id="progressText">1 / 10</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Floating Owner Name Tag & SVG Graphic Display -->
+            <div class="relative w-full h-44 md:h-52 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-800/60 border border-white/10 overflow-hidden flex items-center justify-center p-4">
+                
+                <!-- Floating Name Tag -->
+                <div id="floatingNameTag" class="absolute top-3 right-3 floating-tag px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-xs shadow-lg flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown"></i> <span id="ownerNameText">Kevin's Practice</span>
+                </div>
+
+                <!-- Character SVG / Emoji Display -->
+                <div id="stageGraphic" class="text-center space-y-2">
+                    <div id="characterGraphicEmoji" class="text-6xl md:text-7xl drop-shadow-2xl animate-bounce">
+                        🗺️
+                    </div>
+                    <div id="emotionCueBadge" class="inline-block px-3 py-1 bg-rose-500/20 border border-rose-400/40 text-rose-300 text-xs rounded-full font-bold">
+                        🔥 情感提示：Excited (非常興奮高亢)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Script Display Box -->
+            <div class="space-y-3">
+                <div class="bg-slate-900/70 p-4 md:p-5 rounded-2xl border border-emerald-500/30 relative">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Target Line (目標台詞)</span>
+                        <span id="chorusIndicator" class="hidden px-2 py-0.5 bg-purple-500/30 text-purple-200 text-[10px] rounded font-bold">📢 CHORUS 全體齊讀</span>
+                    </div>
+                    <p id="targetSentence" class="text-xl md:text-2xl font-bold text-white leading-relaxed tracking-wide">
+                        Look at this old map! The treasure is near the big river! I am so excited!
+                    </p>
+                    <p id="targetTranslation" class="text-sm text-emerald-200/80 mt-2 font-medium">
+                        看這張舊地圖！寶藏就在大河附近！我好興奮喔！
+                    </p>
+                </div>
+
+                <!-- Competition Pitch & Intonation Tip Box -->
+                <div class="bg-indigo-900/30 p-3 rounded-xl border border-indigo-500/30 flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-amber-300 text-lg mt-0.5"></i>
+                    <div class="text-xs space-y-0.5">
+                        <span class="font-bold text-indigo-200 block">🏆 比賽語調與情緒特訓重點：</span>
+                        <p id="competitionTipText" class="text-slate-300 leading-normal">
+                            這是隊長 Leo 驚喜的發現！語氣要充滿活力與自信，句尾!符號處請將音調大幅上揚，重音放在 "excited"！
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recognition Live Output & Detailed Feedback Panel -->
+            <div id="feedbackPanel" class="hidden bg-slate-900/80 p-4 rounded-2xl border border-white/10 space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">您的朗讀語音辨識結果：</span>
+                    <div id="scoreBadge" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                        Score: 92
+                    </div>
+                </div>
+                <p id="recognizedText" class="text-base text-slate-200 italic font-medium">
+                    "Look at this old map..."
+                </p>
+
+                <!-- NEW: 學生自己的錄音回放區塊 -->
+                <div id="myAudioContainer" class="hidden mt-2 p-3 bg-slate-800/80 rounded-xl border border-emerald-500/30">
+                    <span class="text-xs text-emerald-400 font-bold mb-2 block">🎧 聽聽看你剛剛的錄音：</span>
+                    <audio id="myAudioPlayer" controls class="h-8 w-full"></audio>
+                </div>
+
+                <!-- Detailed Multi-Dimensional Feedback -->
+                <div id="detailedFeedback" class="text-xs space-y-1.5 p-3 rounded-xl bg-slate-800/80 border border-white/5">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Audio & Practice Controls Panel -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                <!-- Listen Demo -->
+                <button onclick="playTTSDemo()" class="py-3 px-4 rounded-2xl bg-indigo-600/80 hover:bg-indigo-500 text-white font-bold text-sm flex items-center justify-center gap-2 border border-indigo-400/30 transition-all">
+                    <i class="fa-solid fa-volume-high text-lg"></i> 聽比賽示範語音
+                </button>
+
+                <!-- Record / Mic -->
+                <button id="micBtn" onclick="toggleRecording()" class="py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-bold text-sm flex items-center justify-center gap-2 border border-rose-400/30 transition-all shadow-lg">
+                    <i class="fa-solid fa-microphone text-lg" id="micIcon"></i> <span id="micBtnText">開始錄音挑戰</span>
+                </button>
+
+                <!-- Retry Current Line -->
+                <button onclick="resetCurrentLine()" class="py-3 px-4 rounded-2xl bg-slate-700/80 hover:bg-slate-600 text-slate-200 font-bold text-sm flex items-center justify-center gap-2 border border-white/10 transition-all">
+                    <i class="fa-solid fa-rotate-left"></i> 重講一次 (清除舊紀錄)
+                </button>
+
+                <!-- Next Line -->
+                <button id="nextBtn" onclick="nextQuestion()" class="py-3 px-4 rounded-2xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 border border-emerald-400/30 transition-all">
+                    下一題 <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: Competition Practice Certificate & Summary -->
+        <section id="certificateScreen" class="hidden w-full max-w-2xl mx-auto glass-card rounded-3xl p-6 md:p-8 text-center space-y-6">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-500 mx-auto flex items-center justify-center text-4xl shadow-xl animate-bounce">
+                🏆
+            </div>
+
+            <div class="space-y-2">
+                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold">RT COMPETITION CERTIFICATE</span>
+                <h2 class="text-3xl font-extrabold text-white">恭喜完成比賽語音闖關！</h2>
+                <p id="certStudentDetails" class="text-sm text-emerald-300">501 - 12號 Kevin (飾演 Leo)</p>
+            </div>
+
+            <!-- Score Summary Card -->
+            <div class="grid grid-cols-3 gap-3 bg-slate-900/60 p-4 rounded-2xl border border-white/10">
+                <div>
+                    <span class="text-xs text-slate-400 block">總練習句數</span>
+                    <span id="totalSentencesText" class="text-xl font-bold text-white">8 句</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">平均比賽得分</span>
+                    <span id="averageScoreText" class="text-2xl font-black text-amber-400">92.5</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">評語等級</span>
+                    <span id="rankGradeText" class="text-xl font-bold text-emerald-400">特優 Excellent</span>
+                </div>
+            </div>
+
+            <!-- NEW: 完整錄音回顧區 -->
+            <div id="recordingSummaryList" class="bg-slate-900/40 p-4 rounded-2xl border border-white/10 text-left max-h-[350px] overflow-y-auto space-y-3">
+                <h3 class="text-sm font-bold text-emerald-300 mb-2 border-b border-white/10 pb-2">🎙️ 你的精彩錄音總回顧</h3>
+                <!-- 動態載入錄音列表 -->
+            </div>
+
+            <p class="text-xs text-slate-300 leading-relaxed">
+                你的語氣、發音與齊讀節奏表現非常優異！請繼續保持高亢自信的情緒，預祝朗讀劇比賽奪得佳績！
+            </p>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="restartFullApp()" class="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-2xl text-sm transition-all">
+                    <i class="fa-solid fa-house"></i> 回首頁重新選擇角色
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- DEVELOPER TOOLS MODAL -->
+    <div id="devModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+        <div class="glass-modal w-full max-w-4xl max-h-[85vh] rounded-3xl p-6 flex flex-col space-y-4 text-slate-100 overflow-hidden">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-emerald-400 text-xl"></i>
+                    <h3 class="text-lg font-bold">老師開發者全覽與校對模式 (Developer Overview)</h3>
+                </div>
+                <button onclick="closeDevModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Config Overview Content -->
+            <div class="flex-1 overflow-y-auto space-y-4 pr-2" id="devModalContent">
+                <!-- Dynamically filled with script configuration -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="pt-3 border-t border-white/10 flex justify-between items-center text-xs text-slate-400">
+                <span>系統相容性：Web Speech API ('en-US') / Tailwind CSS</span>
+                <button onclick="closeDevModal()" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl">
+                    關閉面板
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Message UI -->
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl glass-modal text-white text-sm font-semibold shadow-2xl flex items-center gap-2 border border-emerald-400/40">
+        <i class="fa-solid fa-circle-info text-emerald-300" id="toastIcon"></i>
+        <span id="toastMsg">提示訊息</span>
+    </div>
 
     <script>
-        // ✅ 替換為您的 Google Apps Script 網址
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxtmqvy9miyhwKQqFY_cSk_Cj2Uh_-qRZF_R8UZBxFLUTG9sm5C8LgrKY_KhM43BqHf/exec"; 
-
-        // 統一定義圖片網址
-        function createImg(content, text) {
-            const isSvg = content.trim().startsWith('<');
-            const visual = isSvg ? content : `<text x="50%" y="45%" font-size="180" text-anchor="middle" dominant-baseline="middle">${content}</text>`;
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
-                <rect width="100%" height="100%" fill="#EEF2FF" rx="40"/>
-                ${visual}
-                <text x="50%" y="82%" font-size="45" font-family="sans-serif" font-weight="900" fill="#4F46E5" text-anchor="middle">${text}</text>
-            </svg>`;
-            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-        }
-
-        const IMAGES = {
-            dress: createImg('👗', 'Dress'),
-            skirt: createImg(`
-                <path d="M 140 120 L 260 120 L 320 270 L 80 270 Z" fill="#F472B6"/>
-                <path d="M 140 120 Q 200 145 260 120 L 260 135 Q 200 160 140 135 Z" fill="#DB2777"/>
-                <path d="M 160 138 L 120 270 M 200 148 L 200 270 M 240 138 L 280 270" stroke="#DB2777" stroke-width="8" stroke-linecap="round"/>
-            `, 'Skirt'), 
-            sweater: createImg('🧥', 'Sweater'),
-            tshirt: createImg('👕', 'T-shirt'),
-            pants: createImg('👖', 'Pants'),
-            shorts: createImg('🩳', 'Shorts'),
-            sneakers: createImg(`
-                <g transform="translate(135, 180) rotate(-5)">
-                    <text x="0" y="0" font-size="140" text-anchor="middle" dominant-baseline="middle">👟</text>
-                </g>
-                <g transform="translate(265, 180) scale(-1, 1) rotate(-5)">
-                    <text x="0" y="0" font-size="140" text-anchor="middle" dominant-baseline="middle">👟</text>
-                </g>
-            `, 'Sneakers'),
-            socks: createImg('🧦', 'Socks')
-        };
-
-        const LESSONS = [
+        // ==========================================
+        // 1. RT SCRIPT DATABASE & CONFIGURATION
+        // ==========================================
+        const CHORUS_LINES = [
             {
-                id: 1,
-                title: "Unit 3 (Part 1): How much is the dress?",
-                subtitle: "單字與單數句型",
-                vocabulary: [
-                    { word: "dress", chinese: "洋裝", sentence: "It is a beautiful dress.", img: IMAGES.dress },
-                    { word: "skirt", chinese: "裙子", sentence: "I like this skirt.", img: IMAGES.skirt },
-                    { word: "sweater", chinese: "毛衣", sentence: "It is a warm sweater.", img: IMAGES.sweater },
-                    { word: "T-shirt", chinese: "T恤", sentence: "How much is the T-shirt?", img: IMAGES.tshirt }
-                ],
-                questions: [
-                    { q: "How much is the dress?", chinese: "這件洋裝多少錢？", a: "dress", img: IMAGES.dress },
-                    { q: "It's nine hundred dollars.", chinese: "它是九百元。(指洋裝)", a: "nine hundred", img: IMAGES.dress },
-                    { q: "How much is the skirt?", chinese: "這件裙子多少錢？", a: "skirt", img: IMAGES.skirt },
-                    { q: "It's two hundred and ninety dollars.", chinese: "它是二百九十元。(指裙子)", a: "ninety", img: IMAGES.skirt },
-                    { q: "How much is the sweater?", chinese: "這件毛衣多少錢？", a: "sweater", img: IMAGES.sweater },
-                    { q: "It's five hundred dollars.", chinese: "它是五百元。(指毛衣)", a: "five hundred", img: IMAGES.sweater },
-                    { q: "How much is the T-shirt?", chinese: "這件T恤多少錢？", a: "t-shirt", img: IMAGES.tshirt },
-                    { q: "It's three hundred dollars.", chinese: "它是三百元。(指T恤)", a: "three hundred", img: IMAGES.tshirt }
-                ]
+                id: 'chorus_1',
+                scene: 'Scene 1',
+                role: 'Chorus',
+                speaker: 'Chorus (齊讀組/全體)',
+                text: "Step, step, step! Here we go! Deep in the jungle, fast and slow!",
+                translation: "一步、一步、再一步！我們出發囉！在叢林深處，有快又有慢！",
+                keywords: ["step", "jungle", "fast", "slow"],
+                emotion: "Excited",
+                emotionHint: "🎉 節奏踏步齊讀 (語速穩重、強調音節打擊感)",
+                pitchTip: "比賽重點：這是節奏隊形隊伍踩踏拍子！可搭配踏步，音調節奏要精準，語氣充滿探險活力！",
+                graphic: "👣",
+                isChorus: true
             },
             {
-                id: 2,
-                title: "Unit 3 (Part 2): How much are the pants?",
-                subtitle: "複數名詞與價錢",
-                vocabulary: [
-                    { word: "pants", chinese: "長褲", sentence: "How much are the pants?", img: IMAGES.pants },
-                    { word: "shorts", chinese: "短褲", sentence: "These are my shorts.", img: IMAGES.shorts },
-                    { word: "sneakers", chinese: "運動鞋", sentence: "How much are the sneakers?", img: IMAGES.sneakers },
-                    { word: "socks", chinese: "襪子", sentence: "They're thirty dollars.", img: IMAGES.socks }
-                ],
-                questions: [
-                    { q: "How much are the pants?", chinese: "這件長褲多少錢？", a: "pants", img: IMAGES.pants },
-                    { q: "They're four hundred and fifty dollars.", chinese: "它們是四百五十元。(指長褲)", a: "fifty", img: IMAGES.pants },
-                    { q: "How much are the socks?", chinese: "這雙襪子多少錢？", a: "socks", img: IMAGES.socks },
-                    { q: "They're thirty dollars.", chinese: "它們是三十元。(指襪子)", a: "thirty", img: IMAGES.socks },
-                    { q: "How much are the sneakers?", chinese: "這雙運動鞋多少錢？", a: "sneakers", img: IMAGES.sneakers },
-                    { q: "They're eight hundred dollars.", chinese: "它們是八百元。(指運動鞋)", a: "eight hundred", img: IMAGES.sneakers },
-                    { q: "How much are the shorts?", chinese: "這件短褲多少錢？", a: "shorts", img: IMAGES.shorts },
-                    { q: "They're two hundred dollars.", chinese: "它們是二百元。(指短褲)", a: "two hundred", img: IMAGES.shorts }
-                ]
+                id: 'chorus_2',
+                scene: 'Scene 1',
+                role: 'Chorus',
+                speaker: 'Chorus (齊讀組/全體)',
+                text: "Shhh! Listen! Thump! Thump! Thump! Here comes the monster!",
+                translation: "噓！聽著！重踏聲！怪獸來囉！",
+                keywords: ["shhh", "listen", "thump", "monster"],
+                emotion: "Scared",
+                emotionHint: "😱 緊張壓低聲線後突然放大驚呼",
+                pitchTip: "比賽重點：Shhh要小聲壓低，Thump! Thump!要厚重有震撼力，最後尾音驚恐懸疑！",
+                graphic: "🦖",
+                isChorus: true
+            },
+            {
+                id: 'chorus_3',
+                scene: 'Scene 2',
+                role: 'Chorus',
+                speaker: 'Chorus (齊讀組/全體)',
+                text: "Sad, sad, so sad! Mad, mad, so mad! Save our forest! Don't be bad!",
+                translation: "好悲傷、好悲傷！好生氣、好生氣！拯救我們的森林！不要當壞人！",
+                keywords: ["sad", "mad", "save", "forest", "bad"],
+                emotion: "Angry",
+                emotionHint: "🔥 同情且憤怒的強烈口號齊讀",
+                pitchTip: "比賽重點：Sad 轉 Mad 情緒要加重！音量放寬，重讀 Save 與 Don't！",
+                graphic: "🌳",
+                isChorus: true
+            },
+            {
+                id: 'chorus_4',
+                scene: 'Scene 3',
+                role: 'Chorus',
+                speaker: 'Chorus (齊讀組/全體)',
+                text: "Clean up, clean up, pick it up! Reduce! Reuse! Recycle! Clean up, clean up, pick it up! One, two, three, pull!",
+                translation: "清理乾淨，清理乾淨，拾起來！減量！重複使用！回收！一，二，三，拉！",
+                keywords: ["clean", "pick", "reduce", "reuse", "recycle", "pull"],
+                emotion: "Energetic",
+                emotionHint: "💪 歡樂清掃口令 (極具打擊動作感)",
+                pitchTip: "比賽重點：這段是比賽口號精華！數字 One, two, three, pull! 尾音用力拉長拉重！",
+                graphic: "♻️",
+                isChorus: true
+            },
+            {
+                id: 'chorus_5',
+                scene: 'Scene 3',
+                role: 'Chorus',
+                speaker: 'Chorus (齊讀組/全體)',
+                text: "Protect the Earth! Save the world! We are the Eco Heroes! YEAH!",
+                translation: "保護地球！拯救世界！我們是環保小英雄！耶！",
+                keywords: ["protect", "earth", "save", "world", "heroes", "yeah"],
+                emotion: "Joyful",
+                emotionHint: "🏆 榮耀歡呼大合唱謝幕",
+                pitchTip: "比賽重點：全劇高潮謝幕！音量開到最大，句尾 YEAH! 充滿自信與勝利感！",
+                graphic: "🌍",
+                isChorus: true
             }
         ];
 
-        let state = {
-            view: 'login',
-            currentLesson: null,
-            quizIndex: 0,
-            answers: [],
-            totalScore: 0,
-            isListening: false,
-            speechResult: '',
-            feedback: null,
-            accuracyScore: 0,
-            fluencyScore: 0,
-            isFinalQuiz: false,
-            finalQuestions: [],
-            errorDetails: '',
-            completedLessons: [],
-            studentInfo: { className: '', seatNumber: '', name: '' },
-            showCertificate: false,
-            isSubmitting: false,
-            isSubmitted: false,
-            submitError: null,
-            vocabTarget: null,
-            vocabSpeechResult: '',
-            vocabAccuracy: 0,
-            vocabFeedback: null,
-            isListeningVocab: false
+        // Specific Character Dialogue Sequences
+        const CHARACTER_ROLE_SCRIPTS = {
+            Leo: [
+                {
+                    id: 'leo_1', scene: 'Scene 1', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "Look at this old map! The treasure is near the big river! I am so excited!",
+                    translation: "看這張舊地圖！寶藏就在大河附近！我好興奮喔！",
+                    keywords: ["map", "treasure", "river", "excited"],
+                    emotion: "Excited", emotionHint: "🎉 隊長高亢自信發現寶藏",
+                    pitchTip: "比賽重點：隊長登場！音量飽滿，句尾 'excited!' 語調記得顯著上揚！", graphic: "🗺️"
+                },
+                CHORUS_LINES[0], // Chorus 1
+                {
+                    id: 'leo_2', scene: 'Scene 1', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "Forget the bottles! We need to find the gold!",
+                    translation: "別管那些瓶子了！我們需要找到黃金！",
+                    keywords: ["forget", "bottles", "find", "gold"],
+                    emotion: "Impatient", emotionHint: "💰 迫不及待、急切尋寶",
+                    pitchTip: "比賽重點：展現出粗心急躁的性格，將重音壓在 'gold' 上！", graphic: "🪙"
+                },
+                CHORUS_LINES[1], // Chorus 2
+                {
+                    id: 'leo_3', scene: 'Scene 2', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "Look! There are plastic straws on its head and plastic bags on its arms!",
+                    translation: "看！它的頭上有塑膠吸管，手臂上有塑膠袋！",
+                    keywords: ["plastic", "straws", "head", "bags", "arms"],
+                    emotion: "Shocked", emotionHint: "😲 驚訝發現真相",
+                    pitchTip: "比賽重點：驚訝聲線，重音放在 'straws' 與 'bags'！", graphic: "🥤"
+                },
+                CHORUS_LINES[2], // Chorus 3
+                {
+                    id: 'leo_4', scene: 'Scene 2', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "That’s terrible! Pollution is hurting our planet!",
+                    translation: "太糟糕了！污染正在傷害我們的星球！",
+                    keywords: ["terrible", "pollution", "hurting", "planet"],
+                    emotion: "Sad/Empathetic", emotionHint: "💔 嚴肅警醒、深刻同理",
+                    pitchTip: "比賽重點：轉為嚴肅同情的語氣，'terrible' 念出沈重感。", graphic: "🌏"
+                },
+                {
+                    id: 'leo_5', scene: 'Scene 3', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "Plastic bottles go into the recycling bin! Paper cups go here!",
+                    translation: "塑膠瓶放進回收桶！紙杯放這裡！",
+                    keywords: ["plastic", "bottles", "recycling", "paper", "cups"],
+                    emotion: "Decisive", emotionHint: "📢 隊長發號施令打掃",
+                    pitchTip: "比賽重點：充滿號召力的指令口頭，講得俐落乾脆！", graphic: "🗑️"
+                },
+                CHORUS_LINES[3], // Chorus 4
+                {
+                    id: 'leo_6', scene: 'Scene 3', role: 'Leo', speaker: "Leo (隊長)",
+                    text: "Wow... it is so beautiful!",
+                    translation: "哇... 這裡真是太美了！",
+                    keywords: ["wow", "beautiful"],
+                    emotion: "Awe", emotionHint: "✨ 讚歎溫柔的眼神",
+                    pitchTip: "比賽重點：輕柔輕聲讚歎，'Wow...' 尾音微微拉長。", graphic: "✨"
+                },
+                CHORUS_LINES[4] // Chorus 5
+            ],
+
+            Mia: [
+                {
+                    id: 'mia_1', scene: 'Scene 1', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "Me too! An adventure in the jungle is so cool!",
+                    translation: "我也是！在叢林裡冒險太酷了！",
+                    keywords: ["adventure", "jungle", "cool"],
+                    emotion: "Curious/Happy", emotionHint: "🌟 活潑期待的歡樂聲音",
+                    pitchTip: "比賽重點：女孩清脆歡樂的語調，強調 'cool!' 的感歎號。", graphic: "🎒"
+                },
+                CHORUS_LINES[0],
+                {
+                    id: 'mia_2', scene: 'Scene 1', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "What is that? Is it a wild animal?",
+                    translation: "那是什麼？是野生動物嗎？",
+                    keywords: ["what", "wild", "animal"],
+                    emotion: "Curious", emotionHint: "🔍 警戒疑惑問句",
+                    pitchTip: "比賽重點：連續兩個問句！尾音必須明顯上揚？展現好心警戒。", graphic: "🐯"
+                },
+                CHORUS_LINES[1],
+                {
+                    id: 'mia_3', scene: 'Scene 2', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "Wait, Toby! Look closely. It’s not a monster!",
+                    translation: "等等，Toby！仔細看。它不是怪獸！",
+                    keywords: ["wait", "look", "closely", "not", "monster"],
+                    emotion: "Calm", emotionHint: "💡 鎮定冷靜分析",
+                    pitchTip: "比賽重點：冷靜穩定音調，與 Toby 的尖叫形成鮮明對比！", graphic: "🧐"
+                },
+                {
+                    id: 'mia_4', scene: 'Scene 2', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "Why are you so sad and angry?",
+                    translation: "你為什麼這麼悲傷又生氣呢？",
+                    keywords: ["why", "sad", "angry"],
+                    emotion: "Empathetic", emotionHint: "🥺 溫柔關懷詢問",
+                    pitchTip: "比賽重點：充滿關懷感的問句，語氣放緩柔軟。", graphic: "💧"
+                },
+                CHORUS_LINES[2],
+                {
+                    id: 'mia_5', scene: 'Scene 3', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "Don't worry, Eco Spirit! We can help you!",
+                    translation: "別擔心，環境精靈！我們可以幫你！",
+                    keywords: ["dont", "worry", "eco", "spirit", "help"],
+                    emotion: "Encouraging", emotionHint: "🤝 挺身而出給予自信",
+                    pitchTip: "比賽重點：充滿正能量！堅定有力的保證。", graphic: "🌱"
+                },
+                CHORUS_LINES[3],
+                {
+                    id: 'mia_6', scene: 'Scene 3', role: 'Mia', speaker: "Mia (細心小隊員)",
+                    text: "A clean Earth is better than gold!",
+                    translation: "乾淨的地球比黃金還要寶貴！",
+                    keywords: ["clean", "earth", "better", "gold"],
+                    emotion: "Wise", emotionHint: "💎 深刻體悟領悟點題",
+                    pitchTip: "比賽重點：感人核心台詞！強調 'better than gold'！", graphic: "💎"
+                },
+                CHORUS_LINES[4]
+            ],
+
+            Toby: [
+                {
+                    id: 'toby_1', scene: 'Scene 1', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "But wait... why are there so many plastic bottles on the ground?",
+                    translation: "但是等等... 為什麼地上有這麼多塑膠瓶？",
+                    keywords: ["wait", "why", "plastic", "bottles", "ground"],
+                    emotion: "Confused", emotionHint: "❓ 疑惑低語發問",
+                    pitchTip: "比賽重點：表現出稍微膽小疑惑的細節發問。", graphic: "🍾"
+                },
+                CHORUS_LINES[0],
+                {
+                    id: 'toby_2', scene: 'Scene 1', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "Guys... I hear a weird noise. Grrr... Grrr...",
+                    translation: "大家... 我聽到怪怪的聲音。低吼...低吼...",
+                    keywords: ["guys", "hear", "weird", "noise", "grrr"],
+                    emotion: "Nervous", emotionHint: "😰 發抖發顫低語",
+                    pitchTip: "比賽重點：比賽吸睛重點！聲音帶有顫抖懸疑感，擬聲詞 Grrr! 發聲誇張！", graphic: "🥶"
+                },
+                {
+                    id: 'toby_3', scene: 'Scene 1', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "Oh no! I am so scared! Is it a monster?",
+                    translation: "噢不！我好害怕喔！那是怪獸嗎？",
+                    keywords: ["oh", "no", "scared", "monster"],
+                    emotion: "Terrified", emotionHint: "😱 抱頭恐懼高音尖叫",
+                    pitchTip: "比賽重點：誇張喜感，Oh no! 音高飆高！展現膽小性格。", graphic: "🙀"
+                },
+                CHORUS_LINES[1],
+                {
+                    id: 'toby_4', scene: 'Scene 2', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "Ahh! Help! It’s a trash monster! It's going to eat us!",
+                    translation: "啊！救命！是垃圾怪獸！它要把我們吃掉了！",
+                    keywords: ["ahh", "help", "trash", "monster", "eat"],
+                    emotion: "Panic Scream", emotionHint: "💥 破音高分貝求救",
+                    pitchTip: "比賽重點：極致誇張求救！'Help!' 聲音要高亢又帶動作打擊感！", graphic: "👾"
+                },
+                CHORUS_LINES[2],
+                {
+                    id: 'toby_5', scene: 'Scene 3', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "Yes! Let's pick up the trash together!",
+                    translation: "好！讓我們一起撿垃圾吧！",
+                    keywords: ["yes", "pick", "trash", "together"],
+                    emotion: "Proud/Eager", emotionHint: "🧹 勇於改過熱情響應",
+                    pitchTip: "比賽重點：轉為自信歡樂！重音放在 'Yes!' 與 'together!'。", graphic: "🧹"
+                },
+                CHORUS_LINES[3],
+                {
+                    id: 'toby_6', scene: 'Scene 3', role: 'Toby', speaker: "Toby (膽小愛吃小隊員)",
+                    text: "But wait... we didn't find the gold treasure.",
+                    translation: "但是等等... 我們沒有找到黃金寶藏耶。",
+                    keywords: ["wait", "didn't", "find", "gold", "treasure"],
+                    emotion: "Puzzled", emotionHint: "🤔 搔頭可愛疑惑",
+                    pitchTip: "比賽重點：可愛喜感搔頭語氣，音調稍微委屈呆萌。", graphic: "🪙"
+                },
+                CHORUS_LINES[4]
+            ],
+
+            EcoSpirit: [
+                {
+                    id: 'eco_1', scene: 'Scene 2', role: 'Eco Spirit', speaker: "Eco Spirit (森林守護精靈)",
+                    text: "STOP! Who is making noise in my forest?!",
+                    translation: "住手！是誰在我的森林裡咆哮作鬧？！",
+                    keywords: ["stop", "who", "making", "noise", "forest"],
+                    emotion: "Angry Command", emotionHint: "⚡ 威嚴渾厚憤怒震撼咆哮",
+                    pitchTip: "比賽重點：精靈初登場！STOP! 要極具威嚴與壓迫感，語速沉穩震撼！", graphic: "👺"
+                },
+                {
+                    id: 'eco_2', scene: 'Scene 2', role: 'Eco Spirit', speaker: "Eco Spirit (森林守護精靈)",
+                    text: "I am not a monster. I am the Eco Spirit of this island.",
+                    translation: "我不是怪獸。我是這座島上的環境精靈。",
+                    keywords: ["not", "monster", "eco", "spirit", "island"],
+                    emotion: "Sad Sigh", emotionHint: "😮‍💨 無奈嘆息說明",
+                    pitchTip: "比賽重點：無奈嘆氣聲，情緒從生氣轉為無辜悲傷。", graphic: "🌿"
+                },
+                {
+                    id: 'eco_3', scene: 'Scene 2', role: 'Eco Spirit', speaker: "Eco Spirit (森林守護精靈)",
+                    text: "Because people visit this island and leave all their trash here! I can't move, and I can't breathe!",
+                    translation: "因為人類拜訪這座島卻把垃圾留下來！我動彈不得，也無法呼吸了！",
+                    keywords: ["people", "visit", "trash", "cant", "move", "breathe"],
+                    emotion: "Gasping/Distressed", emotionHint: "💔 痛苦窒息的悲訴",
+                    pitchTip: "比賽重點：極具感染力！'can't breathe!' 聲音要帶著痛苦窒息感！", graphic: "😷"
+                },
+                CHORUS_LINES[2],
+                CHORUS_LINES[3],
+                {
+                    id: 'eco_4', scene: 'Scene 3', role: 'Eco Spirit', speaker: "Eco Spirit (森林守護精靈)",
+                    text: "Ahhh! Thank you! I feel so relieved and happy now! The air is fresh again!",
+                    translation: "啊啊！謝謝你們！我現在感到好輕鬆又好快樂！空氣又變得清新了！",
+                    keywords: ["thank", "relieved", "happy", "air", "fresh"],
+                    emotion: "Relieved/Joyful", emotionHint: "🌸 舒暢開朗大聲感謝",
+                    pitchTip: "比賽重點：舒暢的大喊 Ahhh! 語氣歡樂充滿感激！", graphic: "🌸"
+                },
+                {
+                    id: 'eco_5', scene: 'Scene 3', role: 'Eco Spirit', speaker: "Eco Spirit (森林守護精靈)",
+                    text: "Look around you! Fresh air, green trees, and a clean Earth. THAT is the most precious treasure in the world!",
+                    translation: "看看你的四周！清新的空氣、綠樹與乾淨的地球。那才是世界上最珍貴的寶藏！",
+                    keywords: ["look", "fresh", "trees", "clean", "earth", "precious", "treasure"],
+                    emotion: "Inspirational", emotionHint: "🌟 智慧開導全劇主題點題",
+                    pitchTip: "比賽重點：全劇高潮點題！THAT 要大聲重讀發音！強烈感人！", graphic: "💖"
+                },
+                CHORUS_LINES[4]
+            ],
+
+            Narrator: [
+                {
+                    id: 'nar_1', scene: 'Scene 1', role: 'Narrator', speaker: "Narrator (旁白)",
+                    text: "Three friends, Leo, Mia, and Toby, are on an adventure on Eco Island. They are looking for a secret treasure.",
+                    translation: "三位好朋友 Leo, Mia 和 Toby 正在環保島上探險。他們正在尋找祕密寶藏。",
+                    keywords: ["friends", "adventure", "eco", "island", "secret", "treasure"],
+                    emotion: "Storytelling", emotionHint: "📖 穩重清晰敘事引導",
+                    pitchTip: "比賽重點：旁白咬字要極度清晰，語速適中，充滿講故事的韻律感。", graphic: "📖"
+                },
+                CHORUS_LINES[0],
+                CHORUS_LINES[1],
+                {
+                    id: 'nar_2', scene: 'Scene 2', role: 'Narrator', speaker: "Narrator (旁白)",
+                    text: "A giant creature steps out from behind the trees. It is covered in plastic bags and paper cups!",
+                    translation: "一隻巨大的生物從樹後跨了出來。它身上覆蓋滿了塑膠袋和紙杯！",
+                    keywords: ["giant", "creature", "trees", "plastic", "bags", "paper", "cups"],
+                    emotion: "Suspenseful", emotionHint: "🔮 懸疑期待高潮氛圍",
+                    pitchTip: "比賽重點：營造怪獸出現的緊張氛圍，聲音略微低沈帶有戲劇性！", graphic: "🌲"
+                },
+                CHORUS_LINES[2],
+                {
+                    id: 'nar_3', scene: 'Scene 3', role: 'Narrator', speaker: "Narrator (旁白)",
+                    text: "The kids decide to stop looking for gold and help the Eco Spirit.",
+                    translation: "孩子們決定停止尋找黃金，改為幫助環境精靈。",
+                    keywords: ["kids", "decide", "stop", "gold", "help", "spirit"],
+                    emotion: "Warm", emotionHint: "☀️ 溫暖轉折銜接",
+                    pitchTip: "比賽重點：溫暖正向的語速轉折。", graphic: "☀️"
+                },
+                CHORUS_LINES[3],
+                {
+                    id: 'nar_4', scene: 'Scene 3', role: 'Narrator', speaker: "Narrator (旁白)",
+                    text: "The kids pull off all the plastic bags and cups from the Eco Spirit.",
+                    translation: "孩子們幫環境精靈拔掉了身上所有的塑膠袋和紙杯。",
+                    keywords: ["kids", "pull", "plastic", "bags", "cups"],
+                    emotion: "Action", emotionHint: "🧹 俐落節奏描繪",
+                    pitchTip: "比賽重點：搭配打掃動作敘述，俐落流暢！", graphic: "🤝"
+                },
+                CHORUS_LINES[4]
+            ]
         };
 
-        function updateState(newState) {
-            state = { ...state, ...newState };
-            render();
-        }
+        // ==========================================
+        // 2. STATE MANAGEMENT & GLOBALS
+        // ==========================================
+        let student = {
+            class: '',
+            seat: '',
+            name: '',
+            role: 'Leo',
+            isPreview: false
+        };
 
+        let currentScriptList = [];
+        let currentIndex = 0;
+        let isRecording = false;
         let recognition = null;
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.continuous = false;
-            recognition.interimResults = false;
+        let sessionScores = []; // 結構變更：包含成績與語音網址
+        
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let currentAudioBlobUrl = null;
+        let currentTranscript = "";
 
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                const confidence = event.results[0][0].confidence;
-                
-                if (state.view === 'study') {
-                    state.vocabSpeechResult = transcript;
-                    calculateVocabScores(transcript, confidence);
-                } else {
-                    state.speechResult = transcript;
-                    calculateScores(transcript, confidence);
-                }
-            };
+        // ==========================================
+        // 3. SPEECH & REGEX LOGIC (REGEX & FUZZY MAPPING)
+        // ==========================================
+        
+        // Number to English words Regex map
+        const NUMBER_MAP = {
+            '1': 'one', '2': 'two', '3': 'three', '4': 'four', '5': 'five',
+            '6': 'six', '7': 'seven', '8': 'eight', '9': 'nine', '10': 'ten',
+            '800': 'eight hundred'
+        };
 
-            recognition.onerror = (event) => {
-                console.error("Speech Recognition Error:", event.error);
-                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                    alert("麥克風被阻擋了！🎤\n\n如果您在 Google 協作平台內看到此畫面，請改用「按鈕連結」另開新分頁。");
-                }
-                updateState({ isListening: false, isListeningVocab: false });
-            };
+        // Fuzzy Speech Phonetic Corrections Map for Elementary Students
+        const FUZZY_CORRECTIONS = {
+            "polly's": "pollys", "pollys": "police",
+            "dirty": "thirty",
+            "teacher": "tshirt",
+            "there": "theyre", "their": "theyre", "they're": "theyre",
+            "cant": "cannot", "can't": "cannot",
+            "its": "it is", "it's": "it is",
+            "thats": "that is", "that's": "that is",
+            "dont": "do not", "don't": "do not",
+            "didnt": "did not", "didn't": "did not"
+        };
 
-            recognition.onend = () => {
-                updateState({ isListening: false, isListeningVocab: false });
-            };
-        }
+        /**
+         * Clean and normalize text for accurate speech matching
+         */
+        function normalizeText(text) {
+            if (!text) return '';
+            let cleaned = text.toLowerCase();
 
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.6;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function startListeningBtn() {
-            if (state.isListening) return; 
-            updateState({ speechResult: '', feedback: null, isListening: true });
-            if (recognition) {
-                try { recognition.start(); } catch (e) { updateState({ isListening: false }); }
-            }
-        }
-
-        function startVocabListening(word) {
-            if (state.isListeningVocab) return; 
-            updateState({ vocabTarget: word, vocabSpeechResult: '', vocabFeedback: null, isListeningVocab: true });
-            if (recognition) {
-                try { recognition.start(); } catch (e) { updateState({ isListeningVocab: false }); }
-            }
-        }
-
-        // ✅ 更新版：強大的語音辨識正規化工具 (自動補全 dollars，解決漏字與數字誤判問題)
-        function normalizeSpeechText(text) {
-            let t = text.toLowerCase();
-            
-            // 1. 去除美金符號
-            t = t.replace(/\$/g, "");
-            
-            // 2. 數字與常見錯誤強制替換表 (直接將數字對應到包含 dollars 的完整詞彙)
-            const map = {
-                "900": "nine hundred dollars",
-                "290": "two hundred and ninety dollars",
-                "500": "five hundred dollars",
-                "300": "three hundred dollars",
-                "450": "four hundred and fifty dollars",
-                "415": "four hundred and fifty dollars", // 容錯辨識
-                "30": "thirty dollars",
-                "13": "thirty dollars", // 常見誤判
-                "800": "eight hundred dollars",
-                "200": "two hundred dollars",
-                "dirty": "thirty",
-                "teacher": "t-shirt",
-                "t shirt": "t-shirt",
-                "their": "theyre",
-                "there": "theyre",
-                "they re": "theyre"
-            };
-            
-            for (let key in map) {
-                let regex = new RegExp("\\b" + key + "\\b", "g");
-                t = t.replace(regex, map[key]);
-            }
-            
-            // 3. 避免學生真的有唸 dollars，替換後變成重複的 dollars dollars，做個修剪
-            t = t.replace(/dollars dollars/g, "dollars");
-            
-            // 4. 處理縮寫與連字號
-            t = t.replace(/'/g, "");
-            t = t.replace(/-/g, " ");
-            
-            return t.trim();
-        }
-
-        function calculateVocabScores(result, confidence) {
-            const targetNoSpace = state.vocabTarget.toLowerCase().replace(/[^a-z0-9]/g, ""); 
-            let processedResult = normalizeSpeechText(result); // 使用新的正規化工具
-            const noSpaceResult = processedResult.replace(/[^a-z0-9]/g, "");
-            let acc = noSpaceResult.includes(targetNoSpace) ? 100 : Math.round(getSimilarity(targetNoSpace, noSpaceResult) * 100);
-            state.vocabAccuracy = acc;
-            state.vocabFeedback = acc >= 80 ? 'perfect' : 'retry';
-            updateState({});
-        }
-
-        function getSimilarity(s1, s2) {
-            const longer = s1.length > s2.length ? s1 : s2;
-            const shorter = s1.length > s2.length ? s2 : s1;
-            if (longer.length === 0) return 1.0;
-            const costs = [];
-            for (let i = 0; i <= s1.length; i++) {
-                let lastValue = i;
-                for (let j = 0; j <= s2.length; j++) {
-                    if (i === 0) costs[j] = j;
-                    else {
-                        if (j > 0) {
-                            let newValue = costs[j - 1];
-                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
-                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                            costs[j - 1] = lastValue;
-                            lastValue = newValue;
-                        }
-                    }
-                }
-                if (i > 0) costs[s2.length] = lastValue;
-            }
-            return (longer.length - costs[s2.length]) / longer.length;
-        }
-
-        function calculateScores(result, confidence) {
-            const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
-            const question = questionList[state.quizIndex];
-            
-            // 處理標準答案
-            const baseTarget = question.q.toLowerCase().replace(/'/g, "");
-            const targetForSim = baseTarget.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim(); 
-            
-            // 處理學生語音 (使用新的正規化工具)
-            let processedResult = normalizeSpeechText(result);
-            const cleanResultForSim = processedResult.replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-            
-            const similarity = getSimilarity(targetForSim, cleanResultForSim);
-            let acc = Math.round(similarity * 100);
-            let flu = Math.round(confidence * 100);
-            
-            // 針對特定縮寫的溫馨提醒 (若包含在目標句但學生沒唸出)
-            let extraMsg = "";
-            if (targetForSim.includes("its ") && !cleanResultForSim.includes("its ")) extraMsg = " (提醒：系統未聽到 It's)";
-            if (targetForSim.includes("theyre ") && !cleanResultForSim.includes("theyre ")) extraMsg = " (提醒：系統未聽到 They're)";
-
-            state.accuracyScore = acc;
-            state.fluencyScore = flu;
-            
-            // 將系統真實聽到的原文與提醒顯示出來
-            let extraMsgHtml = extraMsg ? `<br><span class="text-sm text-orange-500">${extraMsg}</span>` : "";
-            state.errorDetails = `系統聽見："${result || '(無聲音)'}"${extraMsgHtml}`;
-            state.feedback = acc >= 80 ? 'perfect' : 'retry'; // 放寬標準至 80 分
-            updateState({}); 
-        }
-
-        function retryQuestion() { 
-            updateState({ feedback: null, speechResult: '' }); 
-        }
-
-        function nextQuestion(acc, flu, finalResult) {
-            const questionList = state.isFinalQuiz ? state.finalQuestions : (state.currentLesson ? state.currentLesson.questions : []);
-            const avgScore = Math.round((acc + flu) / 2);
-            state.answers.push({ 
-                question: questionList[state.quizIndex].q,
-                userAnswer: finalResult || state.speechResult,
-                acc: acc,
-                flu: flu,
-                score: avgScore
+            // 1. Convert numbers to english
+            Object.keys(NUMBER_MAP).forEach(num => {
+                const regex = new RegExp(`\\b${num}\\b`, 'g');
+                cleaned = cleaned.replace(regex, NUMBER_MAP[num]);
             });
-            
-            if (state.quizIndex < questionList.length - 1) {
-                state.quizIndex++;
-            } else {
-                state.totalScore = Math.round(state.answers.reduce((s, curr) => s + curr.score, 0) / state.answers.length);
-                if (state.totalScore >= 85 && state.currentLesson && !state.completedLessons.includes(state.currentLesson.id)) { 
-                    state.completedLessons.push(state.currentLesson.id);
-                }
-                state.view = 'result';
+
+            // 2. Remove apostrophes and standard punctuation
+            cleaned = cleaned.replace(/['’]/g, ''); // protect apostrophes: it's -> its
+            cleaned = cleaned.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()!?]/g, ""); // strip punctuation
+
+            // 3. Split into words and apply fuzzy dictionary normalization
+            let words = cleaned.split(/\s+/).map(w => FUZZY_CORRECTIONS[w] || w);
+            return words.join(' ').trim();
+        }
+
+        // ==========================================
+        // 4. SPEECH RECOGNITION SETUP (ASUS & iPad Safe)
+        // ==========================================
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showToast("⚠️ 您的瀏覽器不支援 Web Speech 語音辨識，建議使用 Chrome 或 Safari！", true);
+                return null;
             }
-            state.feedback = null;
-            state.speechResult = '';
-            updateState({});
+
+            const rec = new SpeechRecognition();
+            rec.lang = 'en-US';
+            rec.continuous = true; // 改為連續辨識，直到手動停止
+            rec.interimResults = true; 
+
+            rec.onstart = () => {
+                currentTranscript = "";
+            };
+
+            rec.onresult = (event) => {
+                let text = "";
+                for (let i = 0; i < event.results.length; ++i) {
+                    text += event.results[i][0].transcript;
+                }
+                currentTranscript = text;
+            };
+
+            rec.onerror = (event) => {
+                console.error("Speech Error:", event.error);
+                if (event.error !== 'no-speech') {
+                    showToast(`語音辨識提醒：${event.error}，請再試一次！`);
+                }
+            };
+
+            rec.onend = () => {
+                // 由手動停止按鈕統一處理狀態
+            };
+
+            return rec;
         }
 
-        function startFinalChallenge() {
-            const allQuestions = [...LESSONS[0].questions, ...LESSONS[1].questions];
-            const shuffled = allQuestions.sort(() => 0.5 - Math.random()).slice(0, 10);
-            updateState({ finalQuestions: shuffled, isFinalQuiz: true, quizIndex: 0, answers: [], view: 'quiz' });
+        // Initialize on load
+        window.onload = () => {
+            recognition = initSpeechRecognition();
+            renderCharacterPicker();
+            // 預先載入語音包
+            window.speechSynthesis.getVoices();
+        };
+
+        // ==========================================
+        // 5. UI CONTROLLERS & NAVIGATION
+        // ==========================================
+        function renderCharacterPicker() {
+            const container = document.getElementById('characterPicker');
+            const characters = [
+                { id: 'Leo', name: "Leo (隊長)", icon: '🦁', color: 'from-amber-500/20 to-orange-500/20 border-amber-400/40' },
+                { id: 'Mia', name: "Mia (細心小隊)", icon: '🦊', color: 'from-emerald-500/20 to-teal-500/20 border-emerald-400/40' },
+                { id: 'Toby', name: "Toby (膽小愛吃)", icon: '🐼', color: 'from-cyan-500/20 to-blue-500/20 border-cyan-400/40' },
+                { id: 'EcoSpirit', name: "Eco Spirit (精靈)", icon: '🧝', color: 'from-purple-500/20 to-pink-500/20 border-purple-400/40' },
+                { id: 'Narrator', name: "Narrator (旁白)", icon: '📜', color: 'from-slate-500/20 to-gray-500/20 border-slate-400/40' }
+            ];
+
+            container.innerHTML = characters.map(c => `
+                <button type="button" onclick="selectRole('${c.id}')" id="roleBtn_${c.id}" class="role-card p-3 rounded-2xl bg-gradient-to-br ${c.color} border text-left flex flex-col items-center justify-center gap-1.5 hover:scale-105 transition-all">
+                    <span class="text-3xl">${c.icon}</span>
+                    <span class="text-xs font-bold text-white text-center">${c.name}</span>
+                </button>
+            `).join('');
+
+            selectRole('Leo'); // Default choice
         }
 
-        // ✅ 核心修改：回報明細功能
-        async function submitToGoogleSheet() {
-            if (!state.studentInfo.name || !state.studentInfo.className || !state.studentInfo.seatNumber) return;
-            updateState({ isSubmitting: true, submitError: null });
+        function selectRole(roleId) {
+            student.role = roleId;
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-emerald-400', 'scale-105');
+            });
+            const selected = document.getElementById(`roleBtn_${roleId}`);
+            if (selected) {
+                selected.classList.add('ring-2', 'ring-emerald-400', 'scale-105');
+            }
+        }
+
+        function startPractice(isPreviewMode) {
+            student.isPreview = isPreviewMode;
+
+            if (!isPreviewMode) {
+                const cls = document.getElementById('studentClass').value.trim();
+                const seat = document.getElementById('studentSeat').value.trim();
+                const name = document.getElementById('studentName').value.trim();
+
+                if (!cls || !seat || !name) {
+                    showToast("請完整填寫班級、座號與姓名喔！");
+                    return;
+                }
+                student.class = cls;
+                student.seat = seat;
+                student.name = name;
+            } else {
+                student.class = "預覽班";
+                student.seat = "00";
+                student.name = "TeacherPreview";
+            }
+
+            // Load character script sequence
+            currentScriptList = CHARACTER_ROLE_SCRIPTS[student.role] || CHARACTER_ROLE_SCRIPTS['Leo'];
+            currentIndex = 0;
+            sessionScores = [];
+
+            // UI updates
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('practiceRoom').classList.remove('hidden');
+
+            if (student.isPreview) {
+                document.getElementById('previewBadge').classList.remove('hidden');
+                document.getElementById('devGearBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('previewBadge').classList.add('hidden');
+                document.getElementById('devGearBtn').classList.add('hidden');
+            }
+
+            // Update Header Info
+            const ownerTag = `${student.name}'s Practice`;
+            document.getElementById('ownerNameText').innerText = ownerTag;
+            document.getElementById('studentInfoTag').innerText = `${student.class} - ${student.seat}號 ${student.name}`;
+
+            loadQuestion(currentIndex);
+        }
+
+        function loadQuestion(index) {
+            if (index >= currentScriptList.length) {
+                showCertificate();
+                return;
+            }
+
+            const item = currentScriptList[index];
+
+            // Render details
+            document.getElementById('progressText').innerText = `${index + 1} / ${currentScriptList.length}`;
+            document.getElementById('stageRoleName').innerText = item.speaker;
+            document.getElementById('stageSceneTag').innerText = item.scene;
+            document.getElementById('characterGraphicEmoji').innerText = item.graphic;
+            document.getElementById('targetSentence').innerText = item.text;
+            document.getElementById('targetTranslation').innerText = item.translation;
+            document.getElementById('emotionCueBadge').innerText = `🔥 情感提示：${item.emotionHint}`;
+            // chorusBadge.classList.add('hidden');
+            if (item.isChorus) {
+                chorusBadge.classList.remove('hidden');
+            } else {
+                chorusBadge.classList.add('hidden');
+            }
+
+            // 清理上一題狀態
+            document.getElementById('feedbackPanel').classList.add('hidden');
+            currentAudioBlobUrl = null;
+            currentTranscript = "";
+        }
+
+        function resetCurrentLine() {
+            if (isRecording) {
+                toggleRecording(); // 如果正在錄音則強制停止
+            }
+            document.getElementById('feedbackPanel').classList.add('hidden');
+            currentTranscript = "";
+            currentAudioBlobUrl = null;
+            showToast("已清除舊發音紀錄，請重新點擊開始錄音！");
+        }
+
+        // ==========================================
+        // 6. STRICT COMPETITION EVALUATION ENGINE
+        // ==========================================
+        function processSpeechResult(spokenText) {
+            const item = currentScriptList[currentIndex];
+            const targetNorm = normalizeText(item.text);
+            const spokenNorm = normalizeText(spokenText);
+
+            // 1. Repetition Check (> 80% repetition without answering key content)
+            const similarity = calcStringSimilarity(targetNorm, spokenNorm);
+            if (similarity > 0.85 && spokenNorm.length < targetNorm.length * 0.5) {
+                showFeedbackPanel(spokenText, 60, [
+                    "⚠️ 【溫馨提醒】：請回答問題或念完整台詞，不要只有複誦關鍵字喔！"
+                ]);
+                return;
+            }
+
+            // 2. Keyword Check Logic
+            let matchedKeywords = 0;
+            item.keywords.forEach(kw => {
+                if (spokenNorm.includes(kw.toLowerCase())) {
+                    matchedKeywords++;
+                }
+            });
+            const keywordRatio = item.keywords.length > 0 ? matchedKeywords / item.keywords.length : 1;
+
+            // Base score algorithm
+            let rawScore = Math.round(similarity * 100);
             
-            const avgAcc = Math.round(state.answers.reduce((s, a) => s + a.acc, 0) / state.answers.length);
-            const avgFlu = Math.round(state.answers.reduce((s, a) => s + a.flu, 0) / state.answers.length);
+            // Competition Keyword Booster Guarantee (Minimum 85 for perfect key terms)
+            if (keywordRatio >= 0.8 && rawScore < 85) {
+                rawScore = 85 + Math.floor(Math.random() * 5); // 85-89 range
+            }
+
+            // 3. Generate Competition Specific Feedback Cues
+            let feedbackTips = [];
+
+            // A. Emotion / Pitch Intonation Check
+            if (item.text.includes('!') || item.emotion.includes('Excited') || item.emotion.includes('Angry') || item.emotion.includes('Scream')) {
+                feedbackTips.push(`🔥 【語氣表現】：這個句子情緒為「${item.emotion}」，感情一定要豐沛，感歎號標點處語調需強烈有力！`);
+            } else if (item.text.includes('?') || item.emotion.includes('Curious')) {
+                feedbackTips.push(`❓ 【語調提醒】：這是疑問句，句尾音調請務必大幅上揚（Rising Pitch）展現好奇感！`);
+            } else {
+                feedbackTips.push(`📖 【比賽發音】：語速穩重清晰，重音著重在關鍵單字上的發音音節。`);
+            }
+
+            // B. Minor Flaw / Plural / Contraction Reminders
+            if (targetNorm.includes('it is') && spokenNorm.includes('its')) {
+                feedbackTips.push(`💡 【溫馨提醒】：記得注意縮寫與完整形（It is vs It's）的朗讀細節喔！`);
+            }
+            // Capping raw score
+            const finalScore = Math.min(Math.max(rawScore, 65), 98);
+            
+            // 將完整紀錄(成績、辨識文字、錄音檔、原句)存入總表
+            sessionScores.push({
+                score: finalScore,
+                text: spokenText,
+                audioUrl: currentAudioBlobUrl,
+                originalText: item.text,
+                scene: item.scene
+            });
+
+            showFeedbackPanel(spokenText, finalScore, feedbackTips);
+
+            // Sync with Google Sheets if configured and non-preview
+            if (!student.isPreview) {
+                sendToGoogleSheets(item, spokenText, finalScore);
+            }
+        }
+
+        function showFeedbackPanel(spokenText, score, tips) {
+            document.getElementById('feedbackPanel').classList.remove('hidden');
+            document.getElementById('recognizedText').innerText = `"${spokenText}"`;
+            
+            // 顯示學生的錄音播放器
+            const audioContainer = document.getElementById('myAudioContainer');
+            const audioPlayer = document.getElementById('myAudioPlayer');
+            if (currentAudioBlobUrl) {
+                audioPlayer.src = currentAudioBlobUrl;
+                audioContainer.classList.remove('hidden');
+            } else {
+                audioContainer.classList.add('hidden');
+            }
+            
+            const badge = document.getElementById('scoreBadge');
+            badge.innerText = `比賽特訓評分: ${score} 分`;
+            if (score >= 85) {
+                badge.className = "px-3 py-1 rounded-full text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/40";
+            } else {
+                badge.className = "px-3 py-1 rounded-full text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-400/40";
+            }
+
+            const tipsContainer = document.getElementById('detailedFeedback');
+            tipsContainer.innerHTML = tips.map(t => `<p class="leading-relaxed">${t}</p>`).join('');
+        }
+
+        // ==========================================
+        // 7. TTS DEMO & MIC RECORDING CONTROLS
+        // ==========================================
+        function playTTSDemo() {
+            const item = currentScriptList[currentIndex];
+            window.speechSynthesis.cancel(); // Stop active audio
+
+            // 修復 Shhh 發音過短問題，讓語音拉長
+            let speakText = item.text;
+            if (speakText.includes("Shhh!")) {
+                speakText = speakText.replace("Shhh!", "Shhhhhhhhh!");
+            }
+
+            const utterance = new SpeechSynthesisUtterance(speakText);
+            utterance.lang = 'en-US';
+
+            // 依據角色性別篩選不同的語音
+            const voices = window.speechSynthesis.getVoices();
+            let selectedVoice = null;
+            const maleRoles = ['Leo', 'Toby'];
+            const femaleRoles = ['Mia'];
+            
+            if (maleRoles.includes(item.role)) {
+                // 嘗試尋找男聲
+                selectedVoice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Guy') || v.name.includes('Daniel')));
+            } else if (femaleRoles.includes(item.role)) {
+                // 嘗試尋找女聲
+                selectedVoice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Female') || v.name.includes('Zira') || v.name.includes('Samantha') || v.name.includes('Karen')));
+            }
+            
+            // 如果沒找到特定性別，回退至預設美式發音
+            if (!selectedVoice) {
+                selectedVoice = voices.find(v => v.lang === 'en-US');
+            }
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+
+            // Tune Pitch & Rate according to RT Emotion
+            if (item.emotion.includes('Excited') || item.emotion.includes('Scream')) {
+                utterance.pitch = item.role === 'Mia' ? 1.5 : 1.3;
+                utterance.rate = 1.05;
+            } else if (item.emotion.includes('Angry')) {
+                utterance.pitch = 0.8;
+                utterance.rate = 0.95;
+            } else if (item.emotion.includes('Sad') || item.emotion.includes('Nervous')) {
+                utterance.pitch = 0.85;
+                utterance.rate = 0.85;
+            } else {
+                utterance.pitch = 1.0;
+                utterance.rate = 0.95;
+            }
+
+            window.speechSynthesis.speak(utterance);
+            showToast("🔊 正在播放比賽等級示範發音...");
+        }
+
+        async function toggleRecording() {
+            if (!recognition) {
+                recognition = initSpeechRecognition();
+                if (!recognition) return;
+            }
+
+            if (isRecording) {
+                // 【手動停止錄音】
+                isRecording = false;
+                updateMicUI(false);
+                
+                if (recognition) recognition.stop();
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                }
+                showToast("語音分析中...");
+                
+                // 防呆機制：若未抓到任何字
+                setTimeout(() => {
+                    if (currentTranscript.trim() === "") {
+                        showToast("⚠️ 聽不清楚，請再試一次！(請確保麥克風收音正常)");
+                    }
+                }, 800);
+
+            } else {
+                // 【開始錄音】
+                audioChunks = [];
+                currentTranscript = "";
+                document.getElementById('feedbackPanel').classList.add('hidden');
+                
+                try {
+                    // 請求麥克風權限並啟用 MediaRecorder 錄製實際音檔
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.ondataavailable = e => {
+                        audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        // 錄音完成，轉換為可播放的音檔網址
+                        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                        currentAudioBlobUrl = URL.createObjectURL(blob);
+                        
+                        // 處理語音辨識出之文字
+                        const textToProcess = currentTranscript.trim() || "(未偵測到文字)";
+                        processSpeechResult(textToProcess);
+                        
+                        // 關閉串流釋放麥克風
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    mediaRecorder.start();
+                    recognition.start();
+                    isRecording = true;
+                    updateMicUI(true);
+                    showToast("🎙️ 錄音中，唸完請點擊「停止錄音」！");
+                } catch (err) {
+                    console.error("Mic error:", err);
+                    showToast("⚠️ 無法存取麥克風，請允許瀏覽器麥克風權限！");
+                }
+            }
+        }
+
+        function updateMicUI(recording) {
+            const micBtn = document.getElementById('micBtn');
+            const micIcon = document.getElementById('micIcon');
+            const micBtnText = document.getElementById('micBtnText');
+
+            if (recording) {
+                micBtn.className = "py-3 px-4 rounded-2xl bg-red-600 text-white font-bold text-sm flex items-center justify-center gap-2 border border-red-400/50 mic-pulse shadow-xl";
+                micIcon.className = "fa-solid fa-stop text-lg animate-pulse";
+                micBtnText.innerText = "唸完請點此停止";
+            } else {
+                micBtn.className = "py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-bold text-sm flex items-center justify-center gap-2 border border-rose-400/30 transition-all shadow-lg";
+                micIcon.className = "fa-solid fa-microphone text-lg";
+                micBtnText.innerText = "開始錄音挑戰";
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion(currentIndex);
+        }
+
+        // ==========================================
+        // 8. CERTIFICATE & DEVELOPER TOOLS MODAL
+        // ==========================================
+        function showCertificate() {
+            document.getElementById('practiceRoom').classList.add('hidden');
+            document.getElementById('certificateScreen').classList.remove('hidden');
+
+            const avg = sessionScores.length > 0 
+                ? (sessionScores.reduce((a, b) => a + b.score, 0) / sessionScores.length).toFixed(1) 
+                : "90.0";
+
+            document.getElementById('totalSentencesText').innerText = `${currentScriptList.length} 句`;
+            document.getElementById('averageScoreText').innerText = avg;
+            document.getElementById('certStudentDetails').innerText = `${student.class} - ${student.seat}號 ${student.name} (飾演 ${student.role})`;
+
+            if (avg >= 90) {
+                document.getElementById('rankGradeText').innerText = "🥇 特優 Excellent";
+            } else if (avg >= 80) {
+                document.getElementById('rankGradeText').innerText = "🥈 優等 Superior";
+            } else {
+                document.getElementById('rankGradeText').innerText = "🥉 甲等 Good";
+            }
+            
+            // 建立總錄音清單回放區
+            const summaryList = document.getElementById('recordingSummaryList');
+            let listHtml = `<h3 class="text-sm font-bold text-emerald-300 mb-2 border-b border-white/10 pb-2">🎙️ 你的精彩錄音總回顧</h3>`;
+            
+            if (sessionScores.length === 0) {
+                listHtml += `<p class="text-xs text-slate-400">尚無錄音紀錄。</p>`;
+            } else {
+                sessionScores.forEach((record, idx) => {
+                    listHtml += `
+                        <div class="bg-slate-800/80 p-3 rounded-xl border border-white/5 space-y-2">
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-xs font-bold text-indigo-300">#${idx + 1} [${record.scene}]</span>
+                                <span class="text-xs font-bold ${record.score >= 85 ? 'text-emerald-400' : 'text-amber-400'}">${record.score} 分</span>
+                            </div>
+                            <p class="text-xs text-slate-300 font-medium">${record.originalText}</p>
+                            ${record.audioUrl ? `<audio controls src="${record.audioUrl}" class="h-8 w-full mt-2"></audio>` : '<p class="text-[10px] text-rose-400">無法獲取音檔</p>'}
+                        </div>
+                    `;
+                });
+            }
+            summaryList.innerHTML = listHtml;
+        }
+
+        function restartFullApp() {
+            document.getElementById('certificateScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // DEVELOPER GEAR MODAL
+        function openDevModal() {
+            const modal = document.getElementById('devModal');
+            const content = document.getElementById('devModalContent');
+
+            let html = `
+                <div class="bg-slate-900/80 p-4 rounded-2xl border border-white/10 space-y-2 mb-4 text-xs">
+                    <p class="text-emerald-300 font-bold">📌 當前狀態資訊：</p>
+                    <p>學生身分: ${student.class} - ${student.seat}號 ${student.name} | 預覽模式: ${student.isPreview}</p>
+                    <p>選擇角色: ${student.role} (總關卡數: ${currentScriptList.length})</p>
+                </div>
+                <h4 class="font-bold text-sm text-emerald-400 mb-2">📜 腳本、翻譯與正確答案關鍵字全覽表：</h4>
+            `;
+
+            currentScriptList.forEach((item, idx) => {
+                html += `
+                    <div class="p-3 bg-slate-800/60 rounded-xl border border-white/5 space-y-1 text-xs">
+                        <div class="flex justify-between font-bold text-indigo-300">
+                            <span>#${idx + 1} [${item.scene}] ${item.speaker}</span>
+                            <span class="text-amber-300">${item.emotion}</span>
+                        </div>
+                        <p class="text-white font-semibold">${item.text}</p>
+                        <p class="text-slate-400">${item.translation}</p>
+                        <p class="text-emerald-400">關鍵字: [ ${item.keywords.join(', ')} ]</p>
+                    </div>
+                `;
+            });
+
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+
+        function closeDevModal() {
+            document.getElementById('devModal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 9. HELPER UTILITIES
+        // ==========================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        function calcStringSimilarity(s1, s2) {
+            if (!s1 || !s2) return 0;
+            const words1 = s1.split(' ');
+            const words2 = s2.split(' ');
+            let matches = 0;
+            words1.forEach(w => {
+                if (words2.includes(w)) matches++;
+            });
+            return matches / Math.max(words1.length, 1);
+        }
+
+        function sendToGoogleSheets(scriptItem, spokenText, score) {
+            const sheetUrl = document.getElementById('sheetUrl').value.trim();
+            if (!sheetUrl) return;
 
             const payload = {
-                className: state.studentInfo.className,
-                seatNumber: state.studentInfo.seatNumber,
-                name: state.studentInfo.name,
-                totalScore: state.totalScore,
-                accuracy: avgAcc,
-                fluency: avgFlu,
-                details: state.answers, // ✅ 將所有題目明細傳送出去
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toISOString(),
+                studentClass: student.class,
+                studentSeat: student.seat,
+                studentName: student.name,
+                role: student.role,
+                scene: scriptItem.scene,
+                targetText: scriptItem.text,
+                spokenText: spokenText,
+                score: score
             };
 
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                updateState({ isSubmitted: true, isSubmitting: false });
-                setTimeout(() => updateState({ showCertificate: true }), 1200);
-            } catch (error) {
-                updateState({ submitError: "傳送失敗，請確認權限。", isSubmitting: false });
-            }
+            fetch(sheetUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.log('Sheets Sync Error:', e));
         }
-
-        function setView(view) { updateState({ view }); }
-        function startStudy(id) { updateState({ currentLesson: LESSONS.find(l => l.id === id), view: 'study' }); }
-        function startQuiz(id) { updateState({ currentLesson: LESSONS.find(l => l.id === id), quizIndex: 0, answers: [], view: 'quiz' }); }
-        function submitNextQuestion() { nextQuestion(state.accuracyScore, state.fluencyScore, state.speechResult); }
-
-        function renderLogin() {
-            return `
-                <div class="max-w-md mx-auto p-6 pt-16 animate-zoom-in">
-                    <div class="bg-white rounded-[40px] shadow-2xl p-10 text-center border-t-8 border-indigo-600">
-                        <h2 class="text-3xl font-black text-slate-800 mb-8">登入系統</h2>
-                        <div class="space-y-4 mb-8 text-left">
-                            <input type="text" oninput="state.studentInfo.className = this.value" placeholder="班級 (例如: 501)" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold" />
-                            <input type="number" oninput="state.studentInfo.seatNumber = this.value" placeholder="座號 (例如: 5)" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold" />
-                            <input type="text" oninput="state.studentInfo.name = this.value" placeholder="姓名" class="w-full p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 font-bold" />
-                        </div>
-                        <button onclick="if(state.studentInfo.name) setView('home')" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg">進入闖關</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderHome() {
-            let lessonsHtml = LESSONS.map(lesson => `
-                <div class="bg-white rounded-3xl shadow-md border-b-4 border-indigo-100 p-8">
-                    <h2 class="text-2xl font-black text-gray-800">${lesson.title}</h2>
-                    <p class="text-indigo-400 font-bold mb-6">${lesson.subtitle}</p>
-                    <div class="flex gap-4">
-                        <button onclick="startStudy(${lesson.id})" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold">1. 認識單字</button>
-                        <button onclick="startQuiz(${lesson.id})" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg">2. 開始闖關</button>
-                    </div>
-                </div>
-            `).join('');
-
-            return `
-                <div class="max-w-2xl mx-auto p-6 animate-zoom-in">
-                    <header class="text-center mb-10"><h1 class="text-4xl font-black text-indigo-600">English Fun</h1></header>
-                    <div class="grid gap-6 mb-10">${lessonsHtml}</div>
-                    <button onclick="startFinalChallenge()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-6 rounded-[30px] font-black text-2xl shadow-xl">🏆 混合總測驗</button>
-                </div>
-            `;
-        }
-
-        function renderStudy() {
-            let vocabHtml = state.currentLesson.vocabulary.map(v => `
-                <div class="bg-white p-4 rounded-3xl flex items-center justify-between border border-slate-100 shadow-sm mb-4">
-                    <div class="flex items-center gap-4">
-                        <img src="${v.img}" class="w-20 h-20 rounded-2xl">
-                        <div><h3 class="text-2xl font-black text-indigo-600">${v.word}</h3><p class="text-slate-400 font-bold">${v.chinese}</p></div>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="speak('${v.word}')" class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center"><i data-lucide="volume-2"></i></button>
-                        <button onclick="startVocabListening('${v.word}')" class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center"><i data-lucide="mic"></i></button>
-                    </div>
-                </div>
-            `).join('');
-            return `<div class="max-w-2xl mx-auto p-6 text-center animate-zoom-in">
-                <button onclick="setView('home')" class="mb-6 font-black text-indigo-600 underline">返回選單</button>
-                <div class="bg-slate-50 p-6 rounded-[40px]">${vocabHtml}</div>
-            </div>`;
-        }
-
-        function renderQuiz() {
-            const questionList = state.isFinalQuiz ? state.finalQuestions : state.currentLesson.questions;
-            const q = questionList[state.quizIndex];
-            const progress = ((state.quizIndex + 1) / questionList.length) * 100;
-
-            return `
-                <div class="max-w-xl mx-auto p-4 animate-zoom-in">
-                    <div class="mb-6"><div class="w-full bg-white h-4 rounded-full p-1"><div class="bg-indigo-600 h-full rounded-full" style="width:${progress}%"></div></div></div>
-                    <div class="bg-white rounded-[40px] shadow-xl p-8 text-center relative overflow-hidden min-h-[500px] flex flex-col justify-center">
-                        ${state.feedback ? `
-                            <div class="absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-8 rounded-[40px]">
-                                <h3 class="text-3xl font-black mb-2">${state.accuracyScore >= 80 ? "做得好！ 🎉" : "再試一次 💪"}</h3>
-                                
-                                <!-- ✅ 新增：把分數大大的顯示出來 -->
-                                <div class="text-2xl font-black text-amber-500 mb-4">得分：${state.accuracyScore} 分</div>
-                                
-                                <p class="text-indigo-600 font-bold mb-8">${state.errorDetails}</p>
-                                <div class="flex w-full gap-4">
-                                    <button onclick="retryQuestion()" class="flex-1 bg-slate-100 py-4 rounded-2xl font-black text-slate-600">重講一次</button>
-                                    <button onclick="submitNextQuestion()" class="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-black">下一題</button>
-                                </div>
-                            </div>
-                        ` : ''}
-                        <img src="${q.img}" class="w-full max-h-56 object-cover rounded-2xl mb-6 shadow-sm">
-                        <h2 class="text-4xl font-black text-indigo-600 mb-2">${q.q}</h2>
-                        <p class="text-xl font-bold text-slate-400 mb-10">${q.chinese}</p>
-                        <button onclick="startListeningBtn()" class="w-24 h-24 mx-auto rounded-full ${state.isListening ? 'bg-red-500 animate-pulse' : 'bg-indigo-600'} text-white shadow-xl flex items-center justify-center">
-                            <i data-lucide="mic" class="w-10 h-10"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderResult() {
-            if (state.showCertificate) {
-                return `<div class="max-w-xl mx-auto p-6 text-center animate-zoom-in">
-                    <div class="bg-white rounded-[40px] p-10 border-8 border-amber-400 shadow-2xl">
-                        <i data-lucide="award" class="w-24 h-24 text-amber-500 mx-auto mb-6"></i>
-                        <h1 class="text-4xl font-black mb-8">恭喜完成！</h1>
-                        <p class="text-xl font-bold mb-2">${state.studentInfo.name} 同學</p>
-                        <p class="text-3xl font-black text-indigo-600">總分：${state.totalScore}</p>
-                        <button onclick="location.reload()" class="mt-10 bg-slate-800 text-white px-10 py-4 rounded-2xl font-black">重新開始</button>
-                    </div>
-                </div>`;
-            }
-
-            return `<div class="max-w-2xl mx-auto p-4 animate-zoom-in">
-                <div class="bg-white rounded-[40px] shadow-xl p-8 text-center">
-                    <h2 class="text-3xl font-black mb-8">測驗結果：${state.totalScore} 分</h2>
-                    <div class="mb-8 text-left space-y-2">
-                        ${state.answers.map((a, i) => `<div class="p-3 bg-slate-50 rounded-xl text-sm"><b>${i+1}.</b> ${a.question}<br><span class="text-indigo-500">聽見：${a.userAnswer}</span> (分：${a.score})</div>`).join('')}
-                    </div>
-                    ${state.isFinalQuiz ? `
-                        <button onclick="submitToGoogleSheet()" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-xl mb-4">
-                            ${state.isSubmitting ? '送出中...' : '送出成績'}
-                        </button>
-                    ` : ''}
-                    <button onclick="setView('home')" class="w-full bg-slate-100 py-4 rounded-2xl font-black">返回主頁</button>
-                </div>
-            </div>`;
-        }
-
-        function render() {
-            const app = document.getElementById('app');
-            let content = '';
-            switch (state.view) {
-                case 'login': content = renderLogin(); break;
-                case 'home': content = renderHome(); break;
-                case 'study': content = renderStudy(); break;
-                case 'quiz': content = renderQuiz(); break;
-                case 'result': content = renderResult(); break;
-            }
-            app.innerHTML = content;
-            if (window.lucide) lucide.createIcons();
-        }
-
-        render();
     </script>
 </body>
 </html>
