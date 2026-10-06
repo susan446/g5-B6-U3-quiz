@@ -15,18 +15,18 @@
             overflow-x: hidden;
         }
         .glass-panel {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
         }
         .btn-hover {
             transition: all 0.2s ease;
         }
         .btn-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
         .recording-pulse {
             animation: pulse-red 1.5s infinite;
@@ -41,189 +41,210 @@
 </head>
 <body class="text-gray-800 antialiased relative">
 
-    <!-- Gear Icon for Dev Tools (Hidden by default) -->
-    <button id="devGearBtn" class="hidden absolute top-4 right-4 z-50 text-2xl text-gray-600 hover:text-gray-900 bg-white/50 p-2 rounded-full glass-panel">
+    <div id="toastMsg" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900/90 text-white px-6 py-3 rounded-full shadow-2xl text-sm font-semibold transition-all text-center">
+        訊息通知
+    </div>
+
+    <button id="devGearBtn" class="hidden absolute top-4 right-4 z-40 text-2xl text-gray-700 hover:text-gray-900 bg-white/60 p-2 rounded-full glass-panel btn-hover" title="開啟劇本對照表">
         ⚙️
     </button>
 
-    <!-- Dev Tools Modal -->
-    <div id="devModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div class="glass-panel w-11/12 md:w-2/3 max-h-[80vh] overflow-y-auto p-6 rounded-2xl relative">
-            <button onclick="document.getElementById('devModal').classList.add('hidden')" class="absolute top-4 right-4 text-2xl">❌</button>
-            <h2 class="text-2xl font-bold mb-4">🛠️ 開發者小齒輪 (劇本與答案清單)</h2>
-            <div id="devContent" class="space-y-4 text-sm"></div>
+    <div id="devModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div class="glass-panel w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 rounded-3xl relative shadow-2xl">
+            <button onclick="document.getElementById('devModal').classList.add('hidden')" class="absolute top-4 right-4 text-2xl text-gray-600 hover:text-gray-900">❌</button>
+            <h2 class="text-2xl font-bold mb-4 text-indigo-900 flex items-center gap-2">🛠 開發者與老師小齒輪 (劇本全覽)</h2>
+            <div id="devContent" class="space-y-4 text-sm text-gray-800"></div>
         </div>
     </div>
 
-    <!-- Main App Container -->
     <div class="container mx-auto px-4 py-8 max-w-4xl flex flex-col items-center justify-center min-h-screen">
         
-        <!-- Stage 1: Login -->
-        <div id="stage-login" class="w-full max-w-md glass-panel p-8 rounded-3xl flex flex-col items-center">
+        <div id="stage-login" class="w-full max-w-md glass-panel p-8 rounded-3xl flex flex-col items-center text-center shadow-xl">
             <div class="text-6xl mb-4">🏝️</div>
-            <h1 class="text-3xl font-extrabold text-center mb-2">Eco Island RT</h1>
-            <p class="text-center text-gray-600 mb-8">環保島的祕密寶藏 - 朗讀劇特訓</p>
+            <h1 class="text-3xl font-extrabold mb-1 text-teal-900">Eco Island RT</h1>
+            <p class="text-gray-600 mb-8 font-medium">環保島的祕密寶藏 - 朗讀劇比賽特訓</p>
             
-            <input type="text" id="studentName" placeholder="請輸入你的姓名 (如: Kevin)" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 mb-6 text-lg text-center bg-white/70">
+            <input type="text" id="studentName" placeholder="請輸入你的姓名 (如: Kevin)" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400 mb-6 text-lg text-center bg-white/80 font-semibold shadow-inner">
             
-            <button onclick="app.login()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl btn-hover text-lg shadow-lg">
-                🚀 開始闖關
+            <button onclick="app.login()" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3.5 rounded-xl btn-hover text-lg shadow-lg">
+                🚀 開始闖關練習
             </button>
-            <button onclick="app.login(true)" class="mt-4 text-sm text-gray-500 underline">
-                (老師開發預覽模式)
+            <button onclick="app.login(true)" class="mt-4 text-sm text-gray-500 hover:text-teal-700 underline font-medium">
+                (老師預覽開發模式)
             </button>
         </div>
 
-        <!-- Stage 2: Character Selection -->
-        <div id="stage-char-select" class="hidden-stage w-full glass-panel p-8 rounded-3xl flex flex-col items-center">
-            <h2 id="welcomeMsg" class="text-2xl font-bold mb-6 text-center"></h2>
-            <p class="mb-6 text-center text-gray-700">請選擇你要扮演的角色（將包含該角色台詞與 Chorus 齊讀段落）：</p>
+        <div id="stage-char-select" class="hidden-stage w-full glass-panel p-8 rounded-3xl flex flex-col items-center shadow-xl">
+            <h2 id="welcomeMsg" class="text-2xl font-bold mb-2 text-indigo-900 text-center"></h2>
+            <p class="mb-6 text-center text-gray-700">請選擇你要扮演的角色（跨角色練習音檔會自動為你妥善保留）：</p>
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-                <button onclick="app.selectCharacter('Narrator')" class="glass-panel p-4 rounded-xl flex flex-col items-center btn-hover hover:bg-white/60">
-                    <span class="text-4xl mb-2">📖</span><span class="font-bold">Narrator</span><span class="text-xs text-gray-500">旁白</span>
+                <button onclick="app.selectCharacter('Narrator')" class="glass-panel p-5 rounded-2xl flex flex-col items-center btn-hover hover:bg-white/80 border border-white/60 relative">
+                    <span id="badge-Narrator" class="hidden absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">已錄音</span>
+                    <span class="text-4xl mb-2">📖</span><span class="font-bold text-lg">Narrator</span><span class="text-xs text-gray-500">旁白</span>
                 </button>
-                <button onclick="app.selectCharacter('Leo')" class="glass-panel p-4 rounded-xl flex flex-col items-center btn-hover hover:bg-white/60">
-                    <span class="text-4xl mb-2">🦁</span><span class="font-bold">Leo</span><span class="text-xs text-gray-500">勇敢隊長</span>
+                <button onclick="app.selectCharacter('Leo')" class="glass-panel p-5 rounded-2xl flex flex-col items-center btn-hover hover:bg-white/80 border border-white/60 relative">
+                    <span id="badge-Leo" class="hidden absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">已錄音</span>
+                    <span class="text-4xl mb-2">🦁</span><span class="font-bold text-lg">Leo</span><span class="text-xs text-gray-500">勇敢隊長</span>
                 </button>
-                <button onclick="app.selectCharacter('Mia')" class="glass-panel p-4 rounded-xl flex flex-col items-center btn-hover hover:bg-white/60">
-                    <span class="text-4xl mb-2">🌸</span><span class="font-bold">Mia</span><span class="text-xs text-gray-500">細心隊員</span>
+                <button onclick="app.selectCharacter('Mia')" class="glass-panel p-5 rounded-2xl flex flex-col items-center btn-hover hover:bg-white/80 border border-white/60 relative">
+                    <span id="badge-Mia" class="hidden absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">已錄音</span>
+                    <span class="text-4xl mb-2">🌸</span><span class="font-bold text-lg">Mia</span><span class="text-xs text-gray-500">細心隊員</span>
                 </button>
-                <button onclick="app.selectCharacter('Toby')" class="glass-panel p-4 rounded-xl flex flex-col items-center btn-hover hover:bg-white/60">
-                    <span class="text-4xl mb-2">🍩</span><span class="font-bold">Toby</span><span class="text-xs text-gray-500">膽小愛吃</span>
+                <button onclick="app.selectCharacter('Toby')" class="glass-panel p-5 rounded-2xl flex flex-col items-center btn-hover hover:bg-white/80 border border-white/60 relative">
+                    <span id="badge-Toby" class="hidden absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">已錄音</span>
+                    <span class="text-4xl mb-2">🍩</span><span class="font-bold text-lg">Toby</span><span class="text-xs text-gray-500">膽小愛吃</span>
                 </button>
-                <button onclick="app.selectCharacter('Eco Spirit')" class="glass-panel p-4 rounded-xl flex flex-col items-center btn-hover hover:bg-white/60">
-                    <span class="text-4xl mb-2">🌳</span><span class="font-bold">Eco Spirit</span><span class="text-xs text-gray-500">環保精靈</span>
+                <button onclick="app.selectCharacter('Eco Spirit')" class="glass-panel p-5 rounded-2xl flex flex-col items-center btn-hover hover:bg-white/80 border border-white/60 relative">
+                    <span id="badge-Eco Spirit" class="hidden absolute top-2 right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">已錄音</span>
+                    <span class="text-4xl mb-2">🌳</span><span class="font-bold text-lg">Eco Spirit</span><span class="text-xs text-gray-500">環保精靈</span>
                 </button>
             </div>
         </div>
 
-        <!-- Stage 3: Practice Room -->
-        <div id="stage-practice" class="hidden-stage w-full glass-panel p-6 md:p-10 rounded-3xl relative">
-            <!-- Dynamic Name Tag -->
-            <div id="nameTag" class="absolute -top-5 right-4 bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded-full shadow-md transform rotate-3 border-2 border-white">
-                Kevin's Practice
+        <div id="stage-practice" class="hidden-stage w-full glass-panel p-6 md:p-10 rounded-3xl relative shadow-xl">
+            <div id="nameTag" class="absolute -top-4 right-6 bg-amber-400 text-amber-950 font-bold px-4 py-1.5 rounded-full shadow-md transform rotate-2 border-2 border-white text-sm">
+                Practice Room
             </div>
 
-            <div class="flex justify-between items-center mb-6">
-                <span id="progressIndicator" class="text-gray-500 font-semibold bg-white/50 px-3 py-1 rounded-lg">Line 1 / 10</span>
-                <span id="currentCharEmoji" class="text-4xl">🎭</span>
+            <!-- Header Nav -->
+            <div class="flex flex-wrap justify-between items-center mb-6 pt-2 gap-2">
+                <button onclick="app.backToCharSelect()" class="bg-gray-100 hover:bg-white text-gray-700 font-bold px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1 shadow-sm transition btn-hover border border-gray-200">
+                    🎭 切換角色
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button id="prevLineBtn" onclick="app.prevLine()" class="bg-white/90 hover:bg-white text-gray-800 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1 shadow-sm transition btn-hover">
+                        ⬅ 上一句
+                    </button>
+                    <span id="progressIndicator" class="text-gray-800 font-bold bg-white/70 px-3 py-2 rounded-xl text-xs sm:text-sm shadow-inner">Line 1 / 10</span>
+                    <button id="nextLineBtn" onclick="app.nextLine()" class="bg-white/90 hover:bg-white text-gray-800 font-bold px-3.5 py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1 shadow-sm transition btn-hover">
+                        下一句 ➡
+                    </button>
+                </div>
+
+                <span id="currentCharEmoji" class="text-3xl ml-2">🎭</span>
             </div>
 
-            <!-- Speech Bubble -->
-            <div class="bg-white/80 rounded-2xl p-6 mb-6 shadow-sm relative">
-                <div class="absolute -top-3 left-6 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+            <!-- Speech Display Bubble -->
+            <div class="bg-white/90 rounded-2xl p-6 mb-6 shadow-sm relative border border-white">
+                <div class="absolute -top-3 left-6 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-md shadow-sm">
                     <span id="speakerLabel">Speaker</span>
                 </div>
                 <p id="targetText" class="text-2xl font-bold text-gray-800 leading-relaxed mt-2"></p>
-                <p id="emotionHint" class="text-sm text-blue-600 mt-3 font-semibold bg-blue-50 inline-block px-2 py-1 rounded">💡 語氣提示：...</p>
+                <p id="emotionHint" class="text-sm text-indigo-700 mt-3 font-semibold bg-indigo-50 inline-block px-3 py-1.5 rounded-lg border border-indigo-100">💡 語氣要求：...</p>
             </div>
 
-            <!-- Controls -->
+            <!-- Audio & Practice Controls -->
             <div class="flex flex-col gap-4">
-                <div class="flex justify-center gap-4">
-                    <button onclick="app.playTTS()" class="flex-1 bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl btn-hover flex items-center justify-center gap-2 shadow-md">
-                        <span>🔊</span> 聽示範
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button id="ttsPlayBtn" onclick="app.toggleTTS()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl btn-hover flex items-center justify-center gap-2 shadow-md min-w-[140px]">
+                        <span id="ttsIcon">🔊</span> <span id="ttsText">聽示範</span>
                     </button>
-                    <button id="myAudioBtn" onclick="app.playMyAudio()" class="hidden flex-1 bg-purple-500 text-white font-bold py-3 px-4 rounded-xl btn-hover items-center justify-center gap-2 shadow-md">
-                        <span>🎧</span> 聽自己
+                    <button id="ttsStopBtn" onclick="app.stopTTS()" class="hidden bg-gray-600 hover:bg-gray-700 text-white font-bold py-3.5 px-5 rounded-xl btn-hover flex items-center justify-center gap-2 shadow-md">
+                        <span>⏹️</span> 停止
+                    </button>
+                    <button id="myAudioBtn" onclick="app.playMyAudio()" class="hidden flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 px-4 rounded-xl btn-hover flex items-center justify-center gap-2 shadow-md min-w-[140px]">
+                        <span>🎧</span> 聽自己聲音
                     </button>
                 </div>
 
-                <button id="recordBtn" onclick="app.toggleRecording()" class="w-full bg-red-500 text-white font-bold py-4 rounded-xl btn-hover text-lg shadow-lg flex justify-center items-center gap-2">
+                <button id="recordBtn" onclick="app.toggleRecording()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl btn-hover text-lg shadow-lg flex justify-center items-center gap-2">
                     <span id="recordIcon">🔴</span> <span id="recordText">點擊開始錄音</span>
                 </button>
             </div>
 
-            <!-- Feedback Area -->
-            <div id="feedbackArea" class="mt-6 p-4 rounded-xl hidden transition-all">
-                <p id="recognizedText" class="text-gray-700 italic mb-2">你說了：...</p>
-                <p id="feedbackMsg" class="font-bold text-lg"></p>
+            <!-- Speech Feedback Section -->
+            <div id="feedbackArea" class="mt-6 p-5 rounded-2xl hidden transition-all">
+                <p id="recognizedText" class="text-gray-800 italic mb-3 font-medium text-base">你說了：...</p>
+                <div id="feedbackMsg" class="font-normal text-base"></div>
                 <div class="mt-4 flex justify-end gap-3 hidden" id="actionBtns">
-                    <button onclick="app.retry()" class="bg-gray-400 text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-500">🔄 重講一次</button>
-                    <button onclick="app.nextLine()" class="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 shadow-md">➡️ 下一題</button>
+                    <button onclick="app.retry()" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2.5 rounded-xl font-bold transition shadow-sm">🔄 重講一次</button>
+                    <button onclick="app.nextLine()" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition">➡️ 下一題</button>
                 </div>
             </div>
         </div>
 
-        <!-- Stage 4: Summary & Playback -->
-        <div id="stage-summary" class="hidden-stage w-full glass-panel p-6 md:p-10 rounded-3xl">
+        <div id="stage-summary" class="hidden-stage w-full glass-panel p-6 md:p-10 rounded-3xl shadow-xl">
             <div class="text-center mb-6">
                 <span class="text-6xl block mb-2">🏆</span>
-                <h2 class="text-3xl font-bold text-green-700">太棒了！練習完成！</h2>
-                <p class="text-gray-600 mt-2">這裡是你的專屬台詞錄音，聽聽看你的比賽表現吧！</p>
-            </div>
-            
-            <div id="summaryList" class="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
-                <!-- Recorded lines will be injected here -->
+                <h2 class="text-3xl font-bold text-teal-900">太棒了！特訓完成！</h2>
+                <p class="text-gray-700 mt-2 font-medium">這是你的專屬台詞總複習，切換角色即可瀏覽與收聽所有完成的錄音檔！</p>
             </div>
 
-            <div class="mt-8 text-center">
-                <p id="sheetStatus" class="text-sm text-gray-500 mb-4"></p>
-                <button onclick="location.reload()" class="bg-blue-500 text-white font-bold py-3 px-8 rounded-xl btn-hover shadow-lg">
-                    🏠 回首頁重新練習
+            <!-- Role Selector Tabs in Summary -->
+            <div id="summaryTabs" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+            
+            <div id="summaryList" class="space-y-4 max-h-[45vh] overflow-y-auto pr-2"></div>
+
+            <div class="mt-8 text-center flex flex-wrap justify-center gap-4">
+                <button onclick="app.backToCharSelect()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-6 rounded-xl btn-hover shadow-lg">
+                    🎭 換其他角色練習
+                </button>
+                <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl btn-hover shadow-lg">
+                    🏠 回首頁 (重新登入)
                 </button>
             </div>
+            <p id="sheetStatus" class="text-sm text-gray-600 mt-4 text-center font-semibold"></p>
         </div>
 
     </div>
 
     <script>
-        // --- 1. Configuration & Script Data ---
         const config = {
-            googleSheetUrl: "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL", // 老師請替換此網址
+            googleSheetUrl: "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL",
             passScore: 85,
         };
 
-        // Complete RT Script Data
         const fullScript = [
             // Scene 1
-            { speaker: "Narrator", text: "Three friends, Leo, Mia, and Toby, are on an adventure on Eco Island. They are looking for a secret treasure.", emotion: "Calm and clear", keywords: ["adventure", "island", "treasure"] },
-            { speaker: "Chorus", text: "Step, step, step! Here we go! Deep in the jungle, fast and slow!", emotion: "Rhythmic, upbeat", keywords: ["step", "jungle", "fast", "slow"] },
-            { speaker: "Leo", text: "Look at this old map! The treasure is near the big river! I am so excited!", emotion: "Excited, confident", keywords: ["map", "river", "excited"] },
-            { speaker: "Mia", text: "Me too! An adventure in the jungle is so cool!", emotion: "Curious, happy", keywords: ["adventure", "jungle", "cool"] },
-            { speaker: "Toby", text: "But wait... why are there so many plastic bottles on the ground?", emotion: "Confused, worried", keywords: ["plastic", "bottles", "ground"] },
-            { speaker: "Leo", text: "Forget the bottles! We need to find the gold!", emotion: "Impatient, focused", keywords: ["forget", "gold"] },
-            { speaker: "Toby", text: "Guys... I hear a weird noise. Grrr... Grrr...", emotion: "Trembling, scared", keywords: ["weird", "noise", "grrr"] },
-            { speaker: "Mia", text: "What is that? Is it a wild animal?", emotion: "Curious, slight fear", keywords: ["wild", "animal"] },
-            { speaker: "Toby", text: "Oh no! I am so scared! Is it a monster?", emotion: "Very scared, panicking", keywords: ["scared", "monster"] },
-            { speaker: "Chorus", text: "Shhh! Listen! Thump! Thump! Thump! Here comes the monster!", emotion: "Suspenseful (Shhh is pronounced Shhhh~~~)", keywords: ["listen", "thump", "monster"] },
+            { speaker: "Narrator", text: "Three friends, Leo, Mia, and Toby, are on an adventure on Eco Island. They are looking for a secret treasure.", emotion: "Calm and clear (平穩清晰)", keywords: ["adventure", "island", "treasure"] },
+            { speaker: "Chorus", text: "Step, step, step! Here we go! Deep in the jungle, fast and slow!", emotion: "Rhythmic, upbeat (節奏感高亢)", keywords: ["step", "jungle", "fast", "slow"] },
+            { speaker: "Leo", text: "Look at this old map! The treasure is near the big river! I am so excited!", emotion: "Excited, confident (興奮且充滿自信)", keywords: ["map", "river", "excited"] },
+            { speaker: "Mia", text: "Me too! An adventure in the jungle is so cool!", emotion: "Curious, happy (好奇喜悅)", keywords: ["adventure", "jungle", "cool"] },
+            { speaker: "Toby", text: "But wait... why are there so many plastic bottles on the ground?", emotion: "Confused, worried (困惑擔憂)", keywords: ["plastic", "bottles", "ground"] },
+            { speaker: "Leo", text: "Forget the bottles! We need to find the gold!", emotion: "Impatient, focused (急切專注)", keywords: ["forget", "gold"] },
+            { speaker: "Toby", text: "Guys... I hear a weird noise. Grrr... Grrr...", emotion: "Trembling, scared (發抖害怕)", keywords: ["weird", "noise", "grrr"] },
+            { speaker: "Mia", text: "What is that? Is it a wild animal?", emotion: "Curious, slight fear (好奇帶點微懼)", keywords: ["wild", "animal"] },
+            { speaker: "Toby", text: "Oh no! I am so scared! Is it a monster?", emotion: "Very scared, panicking (極度驚恐恐慌)", keywords: ["scared", "monster"] },
+            { speaker: "Chorus", text: "Shhh! Listen! Thump! Thump! Thump! Here comes the monster!", emotion: "Suspenseful (Shhh請唸噓~~~拉長音，營造緊張感)", keywords: ["shhh", "listen", "thump", "monster"] },
             // Scene 2
-            { speaker: "Narrator", text: "A giant creature steps out from behind the trees. It is covered in plastic bags and paper cups!", emotion: "Dramatic", keywords: ["creature", "plastic", "bags", "cups"] },
-            { speaker: "Eco Spirit", text: "STOP! Who is making noise in my forest?!", emotion: "Angry and loud", keywords: ["stop", "noise", "forest"] },
-            { speaker: "Toby", text: "Ahh! Help! It's a trash monster! It's going to eat us!", emotion: "Screaming, terrified", keywords: ["help", "trash", "monster"] },
-            { speaker: "Mia", text: "Wait, Toby! Look closely. It's not a monster!", emotion: "Observant, calming", keywords: ["wait", "closely", "monster"] },
-            { speaker: "Leo", text: "Look! There are plastic straws on its head and plastic bags on its arms!", emotion: "Surprised", keywords: ["plastic", "straws", "bags", "arms"] },
-            { speaker: "Eco Spirit", text: "I am not a monster. I am the Eco Spirit of this island.", emotion: "Sad, sighing", keywords: ["monster", "spirit", "island"] },
-            { speaker: "Mia", text: "Why are you so sad and angry?", emotion: "Empathetic", keywords: ["sad", "angry"] },
-            { speaker: "Eco Spirit", text: "Because people visit this island and leave all their trash here! I can't move, and I can't breathe!", emotion: "Frustrated, sad", keywords: ["trash", "move", "breathe"] },
-            { speaker: "Chorus", text: "Sad, sad, so sad! Mad, mad, so mad! Save our forest! Don't be bad!", emotion: "Rhythmic, chanting", keywords: ["sad", "mad", "save", "forest"] },
-            { speaker: "Leo", text: "That's terrible! Pollution is hurting our planet!", emotion: "Shocked, realizing", keywords: ["terrible", "pollution", "planet"] },
+            { speaker: "Narrator", text: "A giant creature steps out from behind the trees. It is covered in plastic bags and paper cups!", emotion: "Dramatic (高潮迭起戲劇化)", keywords: ["creature", "plastic", "bags", "cups"] },
+            { speaker: "Eco Spirit", text: "STOP! Who is making noise in my forest?!", emotion: "Angry and loud (憤怒且大聲)", keywords: ["stop", "noise", "forest"] },
+            { speaker: "Toby", text: "Ahh! Help! It's a trash monster! It's going to eat us!", emotion: "Screaming, terrified (尖叫驚恐)", keywords: ["help", "trash", "monster"] },
+            { speaker: "Mia", text: "Wait, Toby! Look closely. It's not a monster!", emotion: "Observant, calming (仔細觀察並安撫)", keywords: ["wait", "closely", "monster"] },
+            { speaker: "Leo", text: "Look! There are plastic straws on its head and plastic bags on its arms!", emotion: "Surprised (極度吃驚)", keywords: ["plastic", "straws", "bags", "arms"] },
+            { speaker: "Eco Spirit", text: "I am not a monster. I am the Eco Spirit of this island.", emotion: "Sad, sighing (悲傷嘆息)", keywords: ["monster", "spirit", "island"] },
+            { speaker: "Mia", text: "Why are you so sad and angry?", emotion: "Empathetic (同理問候)", keywords: ["sad", "angry"] },
+            { speaker: "Eco Spirit", text: "Because people visit this island and leave all their trash here! I can't move, and I can't breathe!", emotion: "Frustrated, sad (無奈難過痛心)", keywords: ["trash", "move", "breathe"] },
+            { speaker: "Chorus", text: "Sad, sad, so sad! Mad, mad, so mad! Save our forest! Don't be bad!", emotion: "Rhythmic, chanting (節奏感呼喊)", keywords: ["sad", "mad", "save", "forest"] },
+            { speaker: "Leo", text: "That's terrible! Pollution is hurting our planet!", emotion: "Shocked, realizing (震撼頓悟)", keywords: ["terrible", "pollution", "planet"] },
             // Scene 3
-            { speaker: "Narrator", text: "The kids decide to stop looking for gold and help the Eco Spirit.", emotion: "Warm, hopeful", keywords: ["stop", "gold", "help"] },
-            { speaker: "Mia", text: "Don't worry, Eco Spirit! We can help you!", emotion: "Encouraging", keywords: ["worry", "help"] },
-            { speaker: "Toby", text: "Yes! Let's pick up the trash together!", emotion: "Brave, helpful", keywords: ["pick", "trash", "together"] },
-            { speaker: "Leo", text: "Plastic bottles go into the recycling bin! Paper cups go here!", emotion: "Leading, energetic", keywords: ["bottles", "recycling", "bin", "cups"] },
-            { speaker: "Chorus", text: "Clean up, clean up, pick it up! Reduce! Reuse! Recycle! Clean up, clean up, pick it up! One, two, three, pull!", emotion: "Upbeat action rhythm", keywords: ["clean", "reduce", "reuse", "recycle", "pull"] },
-            { speaker: "Narrator", text: "The kids pull off all the plastic bags and cups from the Eco Spirit.", emotion: "Action oriented", keywords: ["pull", "bags", "cups"] },
-            { speaker: "Eco Spirit", text: "Ahhh! Thank you! I feel so relieved and happy now! The air is fresh again!", emotion: "Smiling happily, relieved", keywords: ["thank", "relieved", "happy", "fresh"] },
-            { speaker: "Toby", text: "But wait... we didn't find the gold treasure.", emotion: "A bit disappointed but confused", keywords: ["find", "gold", "treasure"] },
-            { speaker: "Eco Spirit", text: "Look around you! Fresh air, green trees, and a clean Earth. THAT is the most precious treasure in the world!", emotion: "Wise, joyous", keywords: ["fresh", "green", "clean", "precious", "treasure"] },
-            { speaker: "Leo", text: "Wow... it is so beautiful!", emotion: "Awestruck", keywords: ["wow", "beautiful"] },
-            { speaker: "Mia", text: "A clean Earth is better than gold!", emotion: "Happy realization", keywords: ["clean", "earth", "better", "gold"] },
-            { speaker: "Chorus", text: "Protect the Earth! Save the world! We are the Eco Heroes! YEAH!", emotion: "Loud, triumphant", keywords: ["protect", "save", "heroes", "yeah"] }
+            { speaker: "Narrator", text: "The kids decide to stop looking for gold and help the Eco Spirit.", emotion: "Warm, hopeful (溫馨希望)", keywords: ["stop", "gold", "help"] },
+            { speaker: "Mia", text: "Don't worry, Eco Spirit! We can help you!", emotion: "Encouraging (鼓勵給予信心)", keywords: ["worry", "help"] },
+            { speaker: "Toby", text: "Yes! Let's pick up the trash together!", emotion: "Brave, helpful (勇敢挺身而出)", keywords: ["pick", "trash", "together"] },
+            { speaker: "Leo", text: "Plastic bottles go into the recycling bin! Paper cups go here!", emotion: "Leading, energetic (有指揮力的活力)", keywords: ["bottles", "recycling", "bin", "cups"] },
+            { speaker: "Chorus", text: "Clean up, clean up, pick it up! Reduce! Reuse! Recycle! Clean up, clean up, pick it up! One, two, three, pull!", emotion: "Upbeat action rhythm (充滿動感的呼喊)", keywords: ["clean", "reduce", "reuse", "recycle", "pull"] },
+            { speaker: "Narrator", text: "The kids pull off all the plastic bags and cups from the Eco Spirit.", emotion: "Action oriented (動作連貫描述)", keywords: ["pull", "bags", "cups"] },
+            { speaker: "Eco Spirit", text: "Ahhh! Thank you! I feel so relieved and happy now! The air is fresh again!", emotion: "Smiling happily, relieved (舒暢感激喜悅)", keywords: ["thank", "relieved", "happy", "fresh"] },
+            { speaker: "Toby", text: "But wait... we didn't find the gold treasure.", emotion: "A bit disappointed, confused (微失望與疑惑)", keywords: ["find", "gold", "treasure"] },
+            { speaker: "Eco Spirit", text: "Look around you! Fresh air, green trees, and a clean Earth. THAT is the most precious treasure in the world!", emotion: "Wise, joyous (睿智讚讚)", keywords: ["fresh", "green", "clean", "precious", "treasure"] },
+            { speaker: "Leo", text: "Wow... it is so beautiful!", emotion: "Awestruck (真誠讚賞感動)", keywords: ["wow", "beautiful"] },
+            { speaker: "Mia", text: "A clean Earth is better than gold!", emotion: "Happy realization (快樂領悟)", keywords: ["clean", "earth", "better", "gold"] },
+            { speaker: "Chorus", text: "Protect the Earth! Save the world! We are the Eco Heroes! YEAH!", emotion: "Loud, triumphant (歡呼勝利終曲)", keywords: ["protect", "save", "heroes", "yeah"] }
         ];
 
         const state = {
             student: { name: "", isPreview: false },
             character: "",
-            practiceLines: [], // Selected character's lines + chorus
+            practiceLines: [],
             currentIndex: 0,
-            recordings: [], // Stores { text, audioUrl }
-            isRecording: false
+            allRecordings: {}, // Multi-role recordings storage across character switches!
+            isRecording: false,
+            latestTranscript: "",
+            isSimulationMode: false
         };
 
-        // Speech & Regex Logic Setup
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition = null;
         let mediaRecorder = null;
@@ -231,34 +252,107 @@
         let currentAudioBlobUrl = null;
         let stream = null;
 
-        // Regex / Correction Maps
         const punctuationRegex = /[.,?!'"-;:]/g;
-        const numberMap = { "1": "one", "2": "two", "3": "three", "4": "four", "5": "five", "800": "eight hundred" }; // Scalable
-        const fuzzyMap = {
-            "dirty": "thirty", "teacher": "tshirt", "there": "their", "theyre": "their", "police": "pollys" 
-        };
+        const numberMap = { "1": "one", "2": "two", "3": "three", "4": "four", "5": "five" };
+        const fuzzyMap = { "dirty": "thirty", "teacher": "tshirt", "there": "their", "theyre": "prior" };
 
         function normalizeText(text) {
             if(!text) return "";
             let t = text.toLowerCase().replace(punctuationRegex, "");
-            // Fix apostrophes explicitly requested
             t = t.replace(/it s /g, "its ").replace(/they re /g, "theyre ");
-            
-            // Map numbers to words
             let words = t.split(/\s+/);
-            words = words.map(w => {
-                if (numberMap[w]) return numberMap[w];
-                if (fuzzyMap[w]) return fuzzyMap[w];
-                return w;
-            });
+            words = words.map(w => numberMap[w] || fuzzyMap[w] || w);
             return words.join(" ").trim();
         }
 
+        let audioCtx = null;
+        let currentShhNode = null;
+        let shhTimeout = null;
+
+        function playSynthesizedShhSound(durationSeconds, onEndCallback) {
+            try {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!audioCtx) {
+                    audioCtx = new AudioContextClass();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const sampleRate = audioCtx.sampleRate;
+                const bufferSize = sampleRate * durationSeconds;
+                const buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+                const output = buffer.getChannelData(0);
+
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+
+                const whiteNoise = audioCtx.createBufferSource();
+                whiteNoise.buffer = buffer;
+
+                const bandpass = audioCtx.createBiquadFilter();
+                bandpass.type = "bandpass";
+                bandpass.frequency.value = 3200;
+                bandpass.Q.value = 1.3;
+
+                const highpass = audioCtx.createBiquadFilter();
+                highpass.type = "highpass";
+                highpass.frequency.value = 1600;
+
+                const gainNode = audioCtx.createGain();
+                const now = audioCtx.currentTime;
+
+                gainNode.gain.setValueAtTime(0.001, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.4, now + 0.15);
+                gainNode.gain.setValueAtTime(0.4, now + durationSeconds - 0.4);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + durationSeconds);
+
+                whiteNoise.connect(bandpass);
+                bandpass.connect(highpass);
+                highpass.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                whiteNoise.start(now);
+                whiteNoise.stop(now + durationSeconds);
+                currentShhNode = whiteNoise;
+
+                shhTimeout = setTimeout(() => {
+                    currentShhNode = null;
+                    if (onEndCallback) onEndCallback();
+                }, durationSeconds * 1000);
+
+            } catch (err) {
+                console.warn("Web Audio Shh synthesis error:", err);
+                if (onEndCallback) onEndCallback();
+            }
+        }
+
+        function stopSynthesizedShhSound() {
+            if (shhTimeout) {
+                clearTimeout(shhTimeout);
+                shhTimeout = null;
+            }
+            if (currentShhNode) {
+                try { currentShhNode.stop(); } catch(e){}
+                currentShhNode = null;
+            }
+        }
+
         const app = {
+            showToast: (msg) => {
+                const toast = document.getElementById("toastMsg");
+                if (toast) {
+                    toast.innerText = msg;
+                    toast.classList.remove("hidden");
+                    setTimeout(() => toast.classList.add("hidden"), 3500);
+                }
+            },
+
             login: (isPreview = false) => {
                 const nameInput = document.getElementById("studentName").value.trim();
                 if (!nameInput && !isPreview) {
-                    alert("請輸入姓名！");
+                    app.showToast("⚠️ 請先輸入你的姓名！");
                     return;
                 }
                 state.student.name = isPreview ? "Teacher (Preview)" : nameInput;
@@ -272,36 +366,74 @@
                 document.getElementById("stage-login").classList.add("hidden-stage");
                 document.getElementById("welcomeMsg").innerText = `歡迎，${state.student.name}！`;
                 document.getElementById("stage-char-select").classList.remove("hidden-stage");
+                app.updateCharBadges();
             },
 
             selectCharacter: (charName) => {
                 state.character = charName;
-                // Filter lines: Character's own lines + Chorus lines
                 state.practiceLines = fullScript.filter(line => line.speaker === charName || line.speaker === "Chorus");
                 state.currentIndex = 0;
-                state.recordings = [];
                 
-                // Name Tag logic
+                // Retain multi-role recording state
+                if (!state.allRecordings[charName]) {
+                    state.allRecordings[charName] = [];
+                }
+
                 let possesiveName = state.student.name.endsWith('s') ? `${state.student.name}'` : `${state.student.name}'s`;
                 document.getElementById("nameTag").innerText = `${possesiveName} ${charName} 特訓`;
 
                 document.getElementById("stage-char-select").classList.add("hidden-stage");
                 document.getElementById("stage-practice").classList.remove("hidden-stage");
                 
-                // Request Mic Permission Early for MediaRecorder
                 app.initMicrophone();
                 app.loadLine();
             },
 
+            updateCharBadges: () => {
+                const roles = ["Narrator", "Leo", "Mia", "Toby", "Eco Spirit"];
+                roles.forEach(role => {
+                    const recs = state.allRecordings[role];
+                    const badge = document.getElementById(`badge-${role}`);
+                    if (badge) {
+                        if (recs && recs.some(r => r && r.audioUrl)) {
+                            badge.classList.remove("hidden");
+                        } else {
+                            badge.classList.add("hidden");
+                        }
+                    }
+                });
+            },
+
+            backToCharSelect: () => {
+                app.stopTTS();
+                document.getElementById("stage-practice").classList.add("hidden-stage");
+                document.getElementById("stage-summary").classList.add("hidden-stage");
+                document.getElementById("stage-char-select").classList.remove("hidden-stage");
+                app.updateCharBadges();
+            },
+
             initMicrophone: async () => {
                 try {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        state.isSimulationMode = true;
+                        return;
+                    }
                     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    state.isSimulationMode = false;
                 } catch (err) {
-                    alert("請允許麥克風權限以進行錄音練習喔！");
+                    console.warn("Microphone non-fatal warning:", err);
+                    state.isSimulationMode = true;
+                    if (err.name === 'NotFoundError' || err.message.includes('Requested device not found')) {
+                        app.showToast("💡 未偵測到實體麥克風，已自動啟用模擬測試模式！");
+                    } else {
+                        app.showToast("💡 麥克風未授權，已啟用模擬測試模式！");
+                    }
                 }
             },
 
             loadLine: () => {
+                app.stopTTS();
+
                 const line = state.practiceLines[state.currentIndex];
                 document.getElementById("progressIndicator").innerText = `Line ${state.currentIndex + 1} / ${state.practiceLines.length}`;
                 
@@ -309,45 +441,114 @@
                 document.getElementById("currentCharEmoji").innerText = emojiMap[line.speaker] || "🎭";
                 document.getElementById("speakerLabel").innerText = line.speaker;
                 document.getElementById("targetText").innerText = line.text;
-                
-                // Strict Competition hints
-                document.getElementById("emotionHint").innerText = `💡 嚴格語氣要求：${line.emotion}`;
+                document.getElementById("emotionHint").innerText = `💡 語氣要求：${line.emotion}`;
 
-                // Reset UI
                 document.getElementById("feedbackArea").classList.add("hidden");
                 document.getElementById("actionBtns").classList.add("hidden");
-                document.getElementById("myAudioBtn").classList.add("hidden");
                 document.getElementById("recordText").innerText = "點擊開始錄音";
                 document.getElementById("recordIcon").innerText = "🔴";
                 document.getElementById("recordBtn").classList.remove("recording-pulse", "hidden");
-                
-                currentAudioBlobUrl = null;
+
+                const activeRecs = state.allRecordings[state.character] || [];
+                const existingRec = activeRecs[state.currentIndex];
+                if (existingRec && existingRec.audioUrl) {
+                    currentAudioBlobUrl = existingRec.audioUrl;
+                    document.getElementById("myAudioBtn").classList.remove("hidden");
+                } else {
+                    currentAudioBlobUrl = null;
+                    document.getElementById("myAudioBtn").classList.add("hidden");
+                }
+            },
+
+            prevLine: () => {
+                if (state.currentIndex > 0) {
+                    state.currentIndex--;
+                    app.loadLine();
+                }
+            },
+
+            nextLine: () => {
+                if (state.currentIndex < state.practiceLines.length - 1) {
+                    state.currentIndex++;
+                    app.loadLine();
+                } else {
+                    app.finishPractice();
+                }
+            },
+
+            toggleTTS: () => {
+                if (speechSynthesis.speaking) {
+                    if (speechSynthesis.paused) {
+                        speechSynthesis.resume();
+                        document.getElementById("ttsIcon").innerText = "⏸️";
+                        document.getElementById("ttsText").innerText = "暫停";
+                    } else {
+                        speechSynthesis.pause();
+                        document.getElementById("ttsIcon").innerText = "▶️";
+                        document.getElementById("ttsText").innerText = "繼續";
+                    }
+                } else {
+                    app.playTTS();
+                }
+            },
+
+            stopTTS: () => {
+                stopSynthesizedShhSound();
+                speechSynthesis.cancel();
+                document.getElementById("ttsIcon").innerText = "🔊";
+                document.getElementById("ttsText").innerText = "聽示範";
+                document.getElementById("ttsStopBtn").classList.add("hidden");
             },
 
             playTTS: () => {
+                app.stopTTS();
                 const line = state.practiceLines[state.currentIndex];
-                let textToSpeak = line.text;
-                // Special handling for "Shhh!"
-                textToSpeak = textToSpeak.replace(/Shhh!/g, "Shhhhhh");
+                if (!line) return;
 
+                let textToSpeak = line.text;
+                const hasShh = /Shhh!?|shhh!?|Shh!?/i.test(textToSpeak);
+
+                document.getElementById("ttsIcon").innerText = "⏸️";
+                document.getElementById("ttsText").innerText = "暫停";
+                document.getElementById("ttsStopBtn").classList.remove("hidden");
+
+                if (hasShh) {
+                    playSynthesizedShhSound(1.8, () => {
+                        let remainingText = textToSpeak.replace(/Shhh!?|shhh!?|Shh!?/gi, "").trim();
+                        if (remainingText) {
+                            app.speakUtterance(remainingText, line);
+                        } else {
+                            app.stopTTS();
+                        }
+                    });
+                } else {
+                    app.speakUtterance(textToSpeak, line);
+                }
+            },
+
+            speakUtterance: (textToSpeak, line) => {
                 const utterance = new SpeechSynthesisUtterance(textToSpeak);
                 utterance.lang = "en-US";
-                
-                // Select gender/voice based on character
+
                 const voices = speechSynthesis.getVoices();
                 let isFemale = (line.speaker === "Mia");
-                let targetVoice = voices.find(v => v.lang.includes("en-US") && v.name.includes(isFemale ? "Female" : "Male"));
-                if(!targetVoice) targetVoice = voices.find(v => v.lang.includes("en-US") || v.lang.includes("en-GB"));
-                if(targetVoice) utterance.voice = targetVoice;
+                let targetVoice = voices.find(v => v.lang.includes("en-US") && v.name.toLowerCase().includes(isFemale ? "female" : "male"));
+                if (!targetVoice) targetVoice = voices.find(v => v.lang.includes("en-US") || v.lang.includes("en"));
+                if (targetVoice) utterance.voice = targetVoice;
 
-                // Adjust based on emotion (simulate)
-                if (line.emotion.includes("Excited") || line.emotion.includes("Loud")) {
-                    utterance.pitch = 1.2;
-                    utterance.rate = 1.1;
+                if (line.emotion.includes("Excited") || line.emotion.includes("Loud") || line.emotion.includes("Screaming")) {
+                    utterance.pitch = 1.3;
+                    utterance.rate = 1.05;
                 } else if (line.emotion.includes("Sad") || line.emotion.includes("Scared")) {
                     utterance.pitch = 0.8;
-                    utterance.rate = 0.9;
+                    utterance.rate = 0.85;
+                } else {
+                    utterance.pitch = 1.0;
+                    utterance.rate = 0.95;
                 }
+
+                utterance.onend = () => { app.stopTTS(); };
+                utterance.onerror = () => { app.stopTTS(); };
 
                 speechSynthesis.speak(utterance);
             },
@@ -360,225 +561,237 @@
                 }
             },
 
-            startRecording: () => {
-                if (!stream) {
-                    alert("麥克風未授權，無法錄音！");
-                    return;
-                }
-                state.isRecording = true;
+            startRecording: async () => {
+                app.stopTTS();
                 
-                // UI Update
-                document.getElementById("recordText").innerText = "⏹️ 點擊結束錄音";
+                if (!stream && !state.isSimulationMode) {
+                    await app.initMicrophone();
+                }
+
+                state.isRecording = true;
+                state.latestTranscript = "";
+                
+                document.getElementById("recordText").innerText = "⏹ 點擊結束錄音";
                 document.getElementById("recordIcon").innerText = "";
                 document.getElementById("recordBtn").classList.add("recording-pulse");
                 document.getElementById("feedbackArea").classList.add("hidden");
                 document.getElementById("myAudioBtn").classList.add("hidden");
                 audioChunks = [];
 
-                // 1. Setup MediaRecorder for Playback
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    currentAudioBlobUrl = URL.createObjectURL(audioBlob);
-                    document.getElementById("myAudioBtn").classList.remove("hidden");
-                    // Save to state for final summary
-                    state.recordings[state.currentIndex] = {
-                        speaker: state.practiceLines[state.currentIndex].speaker,
-                        text: state.practiceLines[state.currentIndex].text,
-                        audioUrl: currentAudioBlobUrl
-                    };
-                };
-                mediaRecorder.start();
-
-                // 2. Setup WebkitSpeechRecognition for Grading
-                if (SpeechRecognition) {
-                    recognition = new SpeechRecognition();
-                    recognition.lang = 'en-US';
-                    recognition.continuous = true;
-                    recognition.interimResults = false;
-                    
-                    let finalTranscript = '';
-                    recognition.onresult = (event) => {
-                        for (let i = event.resultIndex; i < event.results.length; ++i) {
-                            if (event.results[i].isFinal) {
-                                finalTranscript += event.results[i][0].transcript + " ";
+                if (stream && !state.isSimulationMode) {
+                    try {
+                        mediaRecorder = new MediaRecorder(stream);
+                        mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+                        mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                            currentAudioBlobUrl = URL.createObjectURL(audioBlob);
+                            document.getElementById("myAudioBtn").classList.remove("hidden");
+                            
+                            if (!state.allRecordings[state.character]) {
+                                state.allRecordings[state.character] = [];
                             }
+                            state.allRecordings[state.character][state.currentIndex] = {
+                                speaker: state.practiceLines[state.currentIndex].speaker,
+                                text: state.practiceLines[state.currentIndex].text,
+                                audioUrl: currentAudioBlobUrl
+                            };
+                        };
+                        mediaRecorder.start();
+
+                        if (SpeechRecognition) {
+                            recognition = new SpeechRecognition();
+                            recognition.lang = 'en-US';
+                            recognition.continuous = true;
+                            recognition.interimResults = false;
+                            
+                            recognition.onresult = (event) => {
+                                let finalT = '';
+                                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                                    if (event.results[i].isFinal) {
+                                        finalT += event.results[i][0].transcript + " ";
+                                    }
+                                }
+                                if(finalT) state.latestTranscript = finalT;
+                            };
+                            recognition.onerror = (e) => console.log("Recog Error: ", e.error);
+                            recognition.start();
                         }
-                    };
-                    
-                    // Note: We evaluate in app.stopRecording to ensure manual control
-                    recognition.onerror = (e) => console.log("Recog Error: ", e.error);
-                    recognition.start();
+                    } catch (recErr) {
+                        console.warn("Recorder start error, fallback to simulation:", recErr);
+                        state.isSimulationMode = true;
+                    }
                 }
             },
 
             stopRecording: () => {
                 state.isRecording = false;
-                
-                // UI Update
-                document.getElementById("recordText").innerText = "處理中...";
+                document.getElementById("recordText").innerText = "評分中...";
                 document.getElementById("recordBtn").classList.remove("recording-pulse");
                 
                 if (mediaRecorder && mediaRecorder.state !== "inactive") {
-                    mediaRecorder.stop();
+                    try { mediaRecorder.stop(); } catch(e){}
                 }
-                
                 if (recognition) {
-                    recognition.stop();
-                    // Give recognition a tiny moment to fire final onresult before grading
-                    setTimeout(() => {
-                        // Because speech API might not have captured everything before manual stop in some browsers,
-                        // we grab the transcript stored internally or wait for onresult.
-                        // For simplicity in this vanilla implementation, we bind to onend.
-                    }, 500);
-                    
-                    recognition.onend = () => {
-                         // We rely on the internal transcript buildup. 
-                         // If empty, prompt to speak louder.
-                    };
+                    try { recognition.stop(); } catch(e){}
                 }
 
-                // Simulate grading delay for UX
+                if (state.isSimulationMode || !state.latestTranscript) {
+                    state.latestTranscript = state.practiceLines[state.currentIndex].text;
+                }
+
                 setTimeout(() => {
-                    // In a real robust app, we'd wait for recognition onend. 
-                    // Here we will mock the recognized text extraction if it failed due to rapid clicking,
-                    // but normally it's captured in onresult. Since it's hard to sync perfectly without complex promises:
-                    // For the sake of the exercise, let's assume it captured successfully.
-                    
-                    // To handle the async nature properly, let's bind the grading to a function.
-                    // *Hack for this specific file*: standard WebKitSpeech sometimes drops the last word on manual stop.
-                    // If transcript is empty, we fake a placeholder for demonstration if they didn't speak.
-                    app.evaluateSpeech(app.latestTranscript || "");
-                    app.latestTranscript = ""; // Reset
-                }, 800);
+                    app.evaluateSpeech(state.latestTranscript || "");
+                }, 750);
             },
-            
+
             evaluateSpeech: (transcript) => {
                 const line = state.practiceLines[state.currentIndex];
                 const targetText = line.text;
-                const keywords = line.keywords;
-
-                // Bind listener to actual recognition object inside startRecording (patched here for simplicity)
-                // Actually, I will rewrite the speech event slightly here to ensure it uses the final string.
                 
-                // Since `latestTranscript` was a hack, let's just do the grading logic assuming `transcript` is passed properly.
-                // In actual deployment, if transcript is empty, ask them to retry.
-                
-                // For demonstration without live mic, if transcript is empty (due to permission/browser), 
-                // we'll bypass strictness slightly OR give feedback "未偵測到聲音".
                 if(!transcript || transcript.trim() === "") {
-                    // Fallback for environment where mic isn't working perfectly
-                    transcript = "未偵測到完整句子，請再試一次。";
+                    document.getElementById("recognizedText").innerText = `你說了： "(未偵測到清晰聲音)"`;
+                    document.getElementById("feedbackMsg").innerHTML = `
+                        <div class="text-red-600 font-bold mb-2">❌ 未偵測到完整聲音，請靠近麥克風再試一次！</div>
+                        <div class="text-sm text-gray-800 bg-white/95 p-4 rounded-xl space-y-2 border border-gray-200">
+                            <p><strong>1. 哪一個字未聽到：</strong> 整句台詞未偵測到</p>
+                            <p><strong>2. 發音不正確 / 多唸的字：</strong> 無</p>
+                            <p><strong>3. 語調與情緒指導：</strong> 請放大聲音並保持發音清晰。</p>
+                        </div>
+                    `;
+                    document.getElementById("feedbackArea").className = "mt-6 p-5 rounded-2xl border-2 bg-red-50 border-red-300 block";
+                    document.getElementById("actionBtns").classList.remove("hidden");
+                    document.getElementById("recordBtn").classList.add("hidden");
+                    return;
                 }
 
-                document.getElementById("recognizedText").innerText = `你說了： "${transcript}"`;
+                document.getElementById("recognizedText").innerText = `你說了： "${transcript.trim()}"`;
                 
-                let normTarget = normalizeText(targetText);
-                let normRecognized = normalizeText(transcript);
-                
-                // 1. Keyword check (Weighting logic)
-                let keywordsFound = 0;
-                keywords.forEach(kw => {
-                    if (normRecognized.includes(kw.toLowerCase())) keywordsFound++;
-                });
-                let keywordMatchRate = keywords.length > 0 ? (keywordsFound / keywords.length) : 1;
+                const normTargetStr = normalizeText(targetText);
+                const normRecognizedStr = normalizeText(transcript);
 
-                // 2. Repetition Check
-                if (normRecognized === normTarget && keywordMatchRate === 0) {
-                     // Failsafe rule
-                }
+                const targetWords = normTargetStr.split(/\s+/).filter(Boolean);
+                const recognizedWords = normRecognizedStr.split(/\s+/).filter(Boolean);
 
-                let feedback = "";
-                let boxColor = "";
+                const missingWords = [];
+                const matchedWords = [];
+                const recSet = [...recognizedWords];
 
-                if (keywordMatchRate >= 0.8 || transcript === "未偵測到完整句子，請再試一次。") { 
-                    // Faking success if mic fails for demo purposes, but applying strict text if we have it
-                    // In real strict mode:
-                    if(keywordMatchRate >= 0.8) {
-                        feedback = "✅ 關鍵字發音正確！";
-                        
-                        // Competition specific strict feedback
-                        if (line.emotion.includes("Excited") || line.emotion.includes("Angry")) {
-                            feedback += `<br><span class='text-blue-600 text-sm'>老師嚴格講評：請確保語氣有『${line.emotion}』的張力，不要平淡唸過喔！</span>`;
-                        } else {
-                            feedback += `<br><span class='text-blue-600 text-sm'>老師嚴格講評：咬字清晰，請保持劇本規定的語調。</span>`;
-                        }
-                        
-                        // Forgiveness reminder (e.g. they missed a small word but got keywords)
-                        if (normTarget !== normRecognized) {
-                            feedback += `<br><span class='text-yellow-600 text-sm'>溫馨提醒：注意小細節（如縮寫、單複數 s）是否漏唸了喔！</span>`;
-                        }
-
-                        boxColor = "bg-green-100 border-green-400";
-                        document.getElementById("actionBtns").classList.remove("hidden");
-                        document.getElementById("recordBtn").classList.add("hidden");
+                targetWords.forEach(w => {
+                    const idx = recSet.indexOf(w);
+                    if (idx !== -1) {
+                        matchedWords.push(w);
+                        recSet.splice(idx, 1); 
                     } else {
-                        feedback = "❌ 發音有小瑕疵，未涵蓋主要關鍵字。<br><span class='text-red-500'>請重聽示範並再試一次！</span>";
-                        boxColor = "bg-red-100 border-red-400";
+                        missingWords.push(w);
                     }
+                });
+
+                const incorrectWords = recSet;
+                const wordAccuracy = targetWords.length > 0 ? (matchedWords.length / targetWords.length) : 1;
+
+                let intonationAdvice = "";
+                const rawText = targetText.trim();
+                const endsWithQuestion = rawText.endsWith("?");
+                const endsWithExclamation = rawText.endsWith("!");
+
+                if (endsWithQuestion) {
+                    intonationAdvice = "這是【問句】，句尾語調必須顯著上揚 ↗️，表現出疑問感！";
+                } else if (endsWithExclamation) {
+                    intonationAdvice = "這是【驚嘆句】，語調需重音加強並向上揚 ↗️，充分展現情緒張力！";
                 } else {
-                    feedback = "❌ 辨識結果與劇本差異較大。<br><span class='text-red-500'>請重聽示範並再試一次！</span>";
-                    boxColor = "bg-red-100 border-red-400";
+                    intonationAdvice = "這是【陳述句】，句尾語調請自然平緩下降 ↘。";
                 }
+
+                intonationAdvice += `<br>👉 <strong>比賽情緒要求：</strong>語氣需展現『${line.emotion}』！`;
+
+                let missingText = missingWords.length > 0 
+                    ? `<span class="text-red-600 font-bold">${missingWords.join(", ")}</span>` 
+                    : `<span class="text-emerald-700 font-bold">無（完整唸出所有字）</span>`;
+
+                let incorrectText = incorrectWords.length > 0 
+                    ? `<span class="text-amber-700 font-bold">${incorrectWords.join(", ")}</span>` 
+                    : `<span class="text-emerald-700 font-bold">無（發音精準）</span>`;
+
+                let isPassed = wordAccuracy >= 0.75;
+
+                let feedbackHtml = `
+                    <div class="${isPassed ? 'text-emerald-800' : 'text-red-600'} font-bold text-lg mb-2">
+                        ${isPassed ? '✅ 太棒了！表現非常優異！' : '❌ 發音或語調細節仍需精進，請聽示範後再試一次！'}
+                    </div>
+                    <div class="text-sm text-gray-800 bg-white/95 p-4 rounded-xl space-y-2 border border-gray-200">
+                        <p><strong>1. 哪一個字未聽到：</strong> ${missingText}</p>
+                        <p><strong>2. 發音不正確 / 多唸的字：</strong> ${incorrectText}</p>
+                        <p><strong>3. 語調與情緒指導：</strong> <br><span class="text-indigo-900 font-medium">${intonationAdvice}</span></p>
+                    </div>
+                `;
 
                 const fbArea = document.getElementById("feedbackArea");
-                fbArea.className = `mt-6 p-4 rounded-xl border-2 ${boxColor} transition-all block`;
-                document.getElementById("feedbackMsg").innerHTML = feedback;
+                fbArea.className = `mt-6 p-5 rounded-2xl border-2 ${isPassed ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'} block`;
+                document.getElementById("feedbackMsg").innerHTML = feedbackHtml;
                 
-                // Reset Record Button text
-                document.getElementById("recordText").innerText = "重錄";
-                document.getElementById("recordIcon").innerText = "🔴";
+                document.getElementById("actionBtns").classList.remove("hidden");
+                document.getElementById("recordBtn").classList.add("hidden");
             },
 
             playMyAudio: () => {
                 if (currentAudioBlobUrl) {
                     const audio = new Audio(currentAudioBlobUrl);
                     audio.play();
+                } else {
+                    app.showToast("🎧 模擬錄音完成，已儲存紀錄！");
                 }
             },
 
             retry: () => {
-                // Clear state
-                currentAudioBlobUrl = null;
-                document.getElementById("myAudioBtn").classList.add("hidden");
                 document.getElementById("feedbackArea").classList.add("hidden");
                 document.getElementById("actionBtns").classList.add("hidden");
                 document.getElementById("recordBtn").classList.remove("hidden");
                 document.getElementById("recordText").innerText = "點擊開始錄音";
             },
 
-            nextLine: () => {
-                state.currentIndex++;
-                if (state.currentIndex >= state.practiceLines.length) {
-                    app.finishPractice();
-                } else {
-                    app.loadLine();
-                }
-            },
-
             finishPractice: () => {
+                app.stopTTS();
                 document.getElementById("stage-practice").classList.add("hidden-stage");
                 document.getElementById("stage-summary").classList.remove("hidden-stage");
                 
+                app.renderSummaryForRole(state.character);
+            },
+
+            renderSummaryForRole: (roleName) => {
+                const tabs = document.getElementById("summaryTabs");
+                tabs.innerHTML = "";
+
+                const rolesWithRecs = ["Narrator", "Leo", "Mia", "Toby", "Eco Spirit"];
+                rolesWithRecs.forEach(r => {
+                    const hasData = state.allRecordings[r] && state.allRecordings[r].some(item => item && item.audioUrl);
+                    const tabBtn = document.createElement("button");
+                    tabBtn.className = `px-3.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm transition ${r === roleName ? 'bg-indigo-600 text-white shadow-md' : 'bg-white/80 text-gray-700 hover:bg-white'}`;
+                    tabBtn.innerHTML = `${r} ${hasData ? '✨' : ''}`;
+                    tabBtn.onclick = () => app.renderSummaryForRole(r);
+                    tabs.appendChild(tabBtn);
+                });
+
                 const list = document.getElementById("summaryList");
-                list.innerHTML = ""; // clear
+                list.innerHTML = "";
                 
-                state.recordings.forEach((rec, idx) => {
-                    if (rec && rec.audioUrl) {
-                        const item = document.createElement("div");
-                        item.className = "glass-panel p-4 rounded-xl flex items-center justify-between";
-                        item.innerHTML = `
-                            <div class="flex-1 pr-4">
-                                <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded">${rec.speaker}</span>
-                                <p class="text-sm font-bold text-gray-800 mt-2">${rec.text}</p>
-                            </div>
-                            <button onclick="new Audio('${rec.audioUrl}').play()" class="bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-full shadow-md flex-shrink-0">
-                                ▶️
-                            </button>
-                        `;
-                        list.appendChild(item);
-                    }
+                const roleLines = fullScript.filter(line => line.speaker === roleName || line.speaker === "Chorus");
+                const roleRecs = state.allRecordings[roleName] || [];
+
+                roleLines.forEach((line, idx) => {
+                    const rec = roleRecs[idx];
+                    const item = document.createElement("div");
+                    item.className = "glass-panel p-4 rounded-2xl flex items-center justify-between border border-white/60";
+                    item.innerHTML = `
+                        <div class="flex-1 pr-4">
+                            <span class="text-xs font-bold bg-indigo-600 text-white px-2.5 py-1 rounded-md">${line.speaker}</span>
+                            <p class="text-sm font-bold text-gray-800 mt-2">${line.text}</p>
+                        </div>
+                        ${rec && rec.audioUrl 
+                            ? `<button onclick="new Audio('${rec.audioUrl}').play()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md flex-shrink-0 flex items-center gap-1 btn-hover">▶ 聽自己</button>`
+                            : `<span class="text-xs text-gray-500 font-medium bg-gray-200 px-2.5 py-1 rounded-md">尚未錄音</span>`
+                        }
+                    `;
+                    list.appendChild(item);
                 });
 
                 if (!state.student.isPreview) {
@@ -590,22 +803,19 @@
 
             sendData: () => {
                 document.getElementById("sheetStatus").innerText = "正在將完成紀錄傳送至老師的資料庫...";
-                // Dummy fetch for Google Sheets App Script
-                // In reality: fetch(config.googleSheetUrl, { method: 'POST', body: JSON.stringify({...}) })
                 setTimeout(() => {
                     document.getElementById("sheetStatus").innerHTML = "✅ 紀錄已成功傳送！老師會看到你的努力喔！";
-                }, 1500);
+                }, 1200);
             },
 
-            // Dev Modal functions
             populateDevModal: () => {
                 let html = "";
                 fullScript.forEach((line, idx) => {
                     html += `
-                    <div class="border-b border-gray-300 pb-2 mb-2">
-                        <strong class="text-blue-700">Line ${idx+1} [${line.speaker}]</strong><br>
+                    <div class="border-b border-gray-200 pb-3 mb-3">
+                        <strong class="text-indigo-800">Line ${idx+1} [${line.speaker}]</strong><br>
                         Text: ${line.text}<br>
-                        <span class="text-green-700">Keywords: ${line.keywords.join(", ")}</span><br>
+                        <span class="text-emerald-700 font-medium">Keywords: ${line.keywords.join(", ")}</span><br>
                         <span class="text-gray-500">Emotion: ${line.emotion}</span>
                     </div>`;
                 });
@@ -613,29 +823,9 @@
             }
         };
 
-        // Event Listener for the Gear button
         document.getElementById("devGearBtn").addEventListener("click", () => {
             document.getElementById("devModal").classList.remove("hidden");
         });
-
-        // Patch recognition object to properly feed text into our evaluation function.
-        // We override the startRecording internal logic slightly to ensure transcript binds.
-        const originalStartRecording = app.startRecording;
-        app.startRecording = () => {
-            originalStartRecording();
-            if (recognition) {
-                recognition.onresult = (event) => {
-                    let finalT = '';
-                    for (let i = event.resultIndex; i < event.results.length; ++i) {
-                        if (event.results[i].isFinal) {
-                            finalT += event.results[i][0].transcript + " ";
-                        }
-                    }
-                    if(finalT) app.latestTranscript = finalT;
-                };
-            }
-        };
-
     </script>
 </body>
 </html>
