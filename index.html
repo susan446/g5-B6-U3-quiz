@@ -605,13 +605,11 @@
                             recognition.interimResults = false;
                             
                             recognition.onresult = (event) => {
-                                let finalT = '';
-                                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                                    if (event.results[i].isFinal) {
-                                        finalT += event.results[i][0].transcript + " ";
-                                    }
+                                let currentTranscript = '';
+                                for (let i = 0; i < event.results.length; ++i) {
+                                    currentTranscript += event.results[i][0].transcript + " ";
                                 }
-                                if(finalT) state.latestTranscript = finalT;
+                                state.latestTranscript = currentTranscript.trim();
                             };
                             recognition.onerror = (e) => console.log("Recog Error: ", e.error);
                             recognition.start();
@@ -635,8 +633,10 @@
                     try { recognition.stop(); } catch(e){}
                 }
 
-                if (state.isSimulationMode || !state.latestTranscript) {
-                    state.latestTranscript = state.practiceLines[state.currentIndex].text;
+                // 【修復】移除原先會自動給予滿分的作弊機制，改為真實呈現或模擬測試字串
+                if (state.isSimulationMode) {
+                    state.latestTranscript = "I think it is a monster"; // 模擬模式下的刻意錯誤示範字串
+                    app.showToast("💡 模擬模式：使用錯誤測試字串進行評分展示");
                 }
 
                 setTimeout(() => {
@@ -649,13 +649,15 @@
                 const targetText = line.text;
                 
                 if(!transcript || transcript.trim() === "") {
-                    document.getElementById("recognizedText").innerText = `你說了： "(未偵測到清晰聲音)"`;
+                    document.getElementById("recognizedText").innerHTML = `<strong>辨識到的內容：</strong> <span class="text-red-500">(未偵測到清晰聲音)</span>`;
                     document.getElementById("feedbackMsg").innerHTML = `
                         <div class="text-red-600 font-bold mb-2">❌ 未偵測到完整聲音，請靠近麥克風再試一次！</div>
                         <div class="text-sm text-gray-800 bg-white/95 p-4 rounded-xl space-y-2 border border-gray-200">
-                            <p><strong>1. 哪一個字未聽到：</strong> 整句台詞未偵測到</p>
+                            <p><strong>1. 漏唸 / 未聽清楚的字：</strong> 整句台詞未偵測到</p>
                             <p><strong>2. 發音不正確 / 多唸的字：</strong> 無</p>
-                            <p><strong>3. 語調與情緒指導：</strong> 請放大聲音並保持發音清晰。</p>
+                            <div class="mt-3 pt-3 border-t border-gray-200">
+                                <p><strong>3. 語調與情緒建議：</strong> 請放大聲音並保持發音清晰。</p>
+                            </div>
                         </div>
                     `;
                     document.getElementById("feedbackArea").className = "mt-6 p-5 rounded-2xl border-2 bg-red-50 border-red-300 block";
@@ -664,7 +666,7 @@
                     return;
                 }
 
-                document.getElementById("recognizedText").innerText = `你說了： "${transcript.trim()}"`;
+                document.getElementById("recognizedText").innerHTML = `<strong>辨識到的內容：</strong> "${transcript.trim()}"`;
                 
                 const normTargetStr = normalizeText(targetText);
                 const normRecognizedStr = normalizeText(transcript);
@@ -704,29 +706,51 @@
 
                 intonationAdvice += `<br>👉 <strong>比賽情緒要求：</strong>語氣需展現『${line.emotion}』！`;
 
+                let accuracyMsg = "";
+                let feedbackClass = "";
+                let isPassed = false;
+
+                // 【修復】依照實際準確率給予對應的動態指導評語
+                if (wordAccuracy >= 0.8) {
+                    isPassed = true;
+                    accuracyMsg = "✅ 發音非常精準！";
+                    intonationAdvice = `你幾乎唸對了所有的字！接下來請點擊「聽自己聲音」，確認是否有做到：<br><span class="text-indigo-900 font-bold">${intonationAdvice}</span>`;
+                    feedbackClass = "bg-emerald-50 border-emerald-300";
+                } else if (wordAccuracy >= 0.4) {
+                    isPassed = false;
+                    accuracyMsg = "⚠️ 發音大致正確，但有部分字詞漏唸或唸錯囉！";
+                    intonationAdvice = `部分發音不夠清晰，會影響語氣的展現。請先放慢速度唸對單字，並注意：<br><span class="text-amber-900 font-bold">${intonationAdvice}</span>`;
+                    feedbackClass = "bg-amber-50 border-amber-300";
+                } else {
+                    isPassed = false;
+                    accuracyMsg = "❌ 辨識到的內容與台詞差異過大！";
+                    intonationAdvice = `系統無法清楚辨識你的發音。請務必先「聽示範」，一個字一個字唸清楚，再嘗試加入情緒：<br><span class="text-red-900 font-bold">${intonationAdvice}</span>`;
+                    feedbackClass = "bg-red-50 border-red-300";
+                }
+
                 let missingText = missingWords.length > 0 
                     ? `<span class="text-red-600 font-bold">${missingWords.join(", ")}</span>` 
                     : `<span class="text-emerald-700 font-bold">無（完整唸出所有字）</span>`;
 
                 let incorrectText = incorrectWords.length > 0 
                     ? `<span class="text-amber-700 font-bold">${incorrectWords.join(", ")}</span>` 
-                    : `<span class="text-emerald-700 font-bold">無（發音精準）</span>`;
-
-                let isPassed = wordAccuracy >= 0.75;
+                    : `<span class="text-emerald-700 font-bold">無（發音精準，無多餘字詞）</span>`;
 
                 let feedbackHtml = `
-                    <div class="${isPassed ? 'text-emerald-800' : 'text-red-600'} font-bold text-lg mb-2">
-                        ${isPassed ? '✅ 太棒了！表現非常優異！' : '❌ 發音或語調細節仍需精進，請聽示範後再試一次！'}
+                    <div class="${isPassed ? 'text-emerald-800' : (wordAccuracy >= 0.4 ? 'text-amber-700' : 'text-red-600')} font-bold text-lg mb-2">
+                        ${accuracyMsg}
                     </div>
                     <div class="text-sm text-gray-800 bg-white/95 p-4 rounded-xl space-y-2 border border-gray-200">
-                        <p><strong>1. 哪一個字未聽到：</strong> ${missingText}</p>
+                        <p><strong>1. 漏唸 / 未聽清楚的字：</strong> ${missingText}</p>
                         <p><strong>2. 發音不正確 / 多唸的字：</strong> ${incorrectText}</p>
-                        <p><strong>3. 語調與情緒指導：</strong> <br><span class="text-indigo-900 font-medium">${intonationAdvice}</span></p>
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p><strong>3. 語調與情緒建議：</strong> <br><span class="inline-block mt-1">${intonationAdvice}</span></p>
+                        </div>
                     </div>
                 `;
 
                 const fbArea = document.getElementById("feedbackArea");
-                fbArea.className = `mt-6 p-5 rounded-2xl border-2 ${isPassed ? 'bg-emerald-50 border-emerald-300' : 'bg-red-50 border-red-300'} block`;
+                fbArea.className = `mt-6 p-5 rounded-2xl border-2 ${feedbackClass} block`;
                 document.getElementById("feedbackMsg").innerHTML = feedbackHtml;
                 
                 document.getElementById("actionBtns").classList.remove("hidden");
